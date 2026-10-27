@@ -1,0 +1,15 @@
+---
+/** Inline "pending confirmation" marker for content that is not a business Fact. */
+import type { VerificationStatus } from '@/config/business';
+import { site } from '@/config/site';
+
+interface Props {
+  status: VerificationStatus;
+  source?: string;
+  text?: string;
+}
+
+const { status, source, text = 'Pending confirmation' } = Astro.props;
+---
+
+{site.showReviewMarkers && status !== 'confirmed' && <span class="review-tag" title={source ? `Source: ${source}` : undefined}>{text}</span>}

@@ -1,0 +1,132 @@
+---
+import { business } from '@/config/business';
+import { footerNav, site } from '@/config/site';
+import Wordmark from './Wordmark.astro';
+import Fact from './Fact.astro';
+import ReviewTag from './ReviewTag.astro';
+
+const year = new Date().getFullYear();
+const legalName = business.legalName.value ?? business.displayName.value ?? 'Weewire';
+---
+
+<footer class="site-footer on-night">
+  <div class="container">
+    <div class="site-footer__top">
+      <div class="site-footer__brand">
+        <Wordmark />
+        <p class="site-footer__descriptor">
+          Network cabling, fiber troubleshooting, data center deployment and on-site technical support.
+        </p>
+      </div>
+
+      <nav class="site-footer__col" aria-label="Footer">
+        <p class="label">Site</p>
+        <ul>
+          {footerNav.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
+        </ul>
+      </nav>
+
+      <div class="site-footer__col">
+        <p class="label">Contact</p>
+        <ul>
+          <li><Fact fact={business.email} label="Email" kind="email" /></li>
+          <li><Fact fact={business.phone} label="Phone" kind="phone" /></li>
+          <li><Fact fact={business.onCallSupport} label="Support hours" /></li>
+        </ul>
+      </div>
+
+      <div class="site-footer__col">
+        <p class="label">Licensing</p>
+        <ul>
+          {
+            business.licenses.map((license) =>
+              license.value ? (
+                <li>
+                  {license.value.label}
+                  <span class="site-footer__sub">{license.value.classification}</span>
+                  <ReviewTag status={license.status} source={license.source} />
+                </li>
+              ) : null,
+            )
+          }
+        </ul>
+      </div>
+    </div>
+
+    <div class="site-footer__bottom">
+      <p>© {year} {legalName}</p>
+      {site.showReviewMarkers && <p>Prototype build · not the production website</p>}
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    padding-block: var(--space-2xl) var(--space-l);
+    font-size: var(--step--1);
+  }
+
+  .site-footer__top {
+    display: grid;
+    gap: var(--space-xl) var(--space-l);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+    padding-bottom: var(--space-xl);
+  }
+
+  .site-footer__brand {
+    grid-column: 1 / -1;
+    max-width: 26rem;
+  }
+
+  .site-footer__brand :global(.wordmark) {
+    font-size: 1.75rem;
+  }
+
+  .site-footer__descriptor {
+    margin-top: var(--space-s);
+    color: var(--night-muted);
+  }
+
+  .site-footer__col ul {
+    list-style: none;
+    padding: 0;
+    margin-top: var(--space-s);
+    display: grid;
+    gap: var(--space-2xs);
+  }
+
+  .site-footer__col a {
+    text-decoration-color: transparent;
+  }
+
+  .site-footer__col a:hover {
+    text-decoration-color: var(--copper-on-night);
+  }
+
+  .site-footer__sub {
+    display: block;
+    color: var(--night-muted);
+  }
+
+  .site-footer__bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-xs) var(--space-l);
+    padding-top: var(--space-m);
+    border-top: 1px solid var(--night-rule);
+    color: var(--night-muted);
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+  }
+
+  @media (min-width: 60rem) {
+    .site-footer__top {
+      grid-template-columns: 1.6fr 1fr 1.2fr 1.2fr;
+    }
+
+    .site-footer__brand {
+      grid-column: auto;
+    }
+  }
+</style>

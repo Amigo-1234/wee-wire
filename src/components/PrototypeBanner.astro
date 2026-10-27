@@ -1,0 +1,46 @@
+---
+import { site } from '@/config/site';
+---
+
+{
+  site.showReviewMarkers && (
+    <aside class="proto-banner" aria-label="Prototype notice">
+      <div class="container proto-banner__inner">
+        <span class="proto-banner__key">Prototype</span>
+        <span>
+          Preview build — not the live Weewire website. Items marked <span class="proto-banner__tag">Pending confirmation</span> are awaiting
+          owner review.
+        </span>
+      </div>
+    </aside>
+  )
+}
+
+<style>
+  .proto-banner {
+    background: var(--ink);
+    color: var(--night-text);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 1.5;
+  }
+
+  .proto-banner__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 0.9rem;
+    padding-block: 0.55rem;
+  }
+
+  .proto-banner__key {
+    color: #f3c768;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .proto-banner__tag {
+    border-bottom: 1px dashed currentColor;
+  }
+</style>

@@ -1,0 +1,135 @@
+---
+/**
+ * Labelled form control with hint and error slots wired for assistive tech.
+ * Error text is filled in by the form script; see pages/contact.astro.
+ */
+import type { HTMLAttributes } from 'astro/types';
+
+type Props = {
+  id: string;
+  label: string;
+  hint?: string;
+  as?: 'input' | 'textarea' | 'select';
+  options?: { value: string; label: string }[];
+  placeholderOption?: string;
+  required?: boolean;
+  class?: string;
+} & Omit<HTMLAttributes<'input'>, 'id' | 'class'>;
+
+const { id, label, hint, as = 'input', options = [], placeholderOption, required = false, class: className, ...rest } = Astro.props;
+const hintId = hint ? `${id}-hint` : undefined;
+const errorId = `${id}-error`;
+---
+
+<div class:list={['field', className]} data-field>
+  <label for={id} class="field__label">
+    {label}
+    {required ? <span class="field__req" aria-hidden="true">Required</span> : <span class="field__opt">Optional</span>}
+  </label>
+  {hint && <p id={hintId} class="field__hint">{hint}</p>}
+  <p id={errorId} class="field__error" hidden></p>
+  {
+    as === 'textarea' ? (
+      <textarea id={id} name={id} class="field__control" required={required} aria-describedby={hintId} data-error-id={errorId} rows={6} {...(rest as HTMLAttributes<'textarea'>)} />
+    ) : as === 'select' ? (
+      <select id={id} name={id} class="field__control" required={required} aria-describedby={hintId} data-error-id={errorId}>
+        {placeholderOption && <option value="">{placeholderOption}</option>}
+        {options.map((o) => <option value={o.value}>{o.label}</option>)}
+      </select>
+    ) : (
+      <input id={id} name={id} class="field__control" required={required} aria-describedby={hintId} data-error-id={errorId} {...rest} />
+    )
+  }
+</div>
+
+<style>
+  .field {
+    display: grid;
+    gap: var(--space-2xs);
+  }
+
+  .field__label {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-s);
+    font-weight: 600;
+  }
+
+  .field__req,
+  .field__opt {
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .field__req {
+    color: var(--copper);
+  }
+
+  .field__hint {
+    margin-top: -0.2rem;
+    font-size: var(--step--1);
+    color: var(--ink-muted);
+  }
+
+  .field__error {
+    font-size: var(--step--1);
+    font-weight: 600;
+    color: #a61b1b;
+  }
+
+  .field__error::before {
+    content: '! ';
+    font-family: var(--font-mono);
+  }
+
+  .field__control {
+    width: 100%;
+    min-height: 3rem;
+    padding: 0.7rem 0.85rem;
+    border: 1px solid var(--ink-muted);
+    border-radius: var(--radius);
+    background: var(--paper-raised);
+    font-size: var(--step-0);
+    line-height: 1.4;
+    transition:
+      border-color 150ms ease,
+      box-shadow 150ms ease;
+  }
+
+  .field__control:hover {
+    border-color: var(--ink);
+  }
+
+  .field__control:focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 1px;
+    border-color: var(--ink);
+  }
+
+  .field__control[aria-invalid='true'] {
+    border-color: #a61b1b;
+    box-shadow: inset 4px 0 0 #a61b1b;
+  }
+
+  select.field__control {
+    appearance: none;
+    padding-right: 2.5rem;
+    background-image:
+      linear-gradient(45deg, transparent 50%, var(--ink) 50%),
+      linear-gradient(135deg, var(--ink) 50%, transparent 50%);
+    background-position:
+      calc(100% - 1.15rem) 50%,
+      calc(100% - 0.8rem) 50%;
+    background-size: 0.35rem 0.35rem;
+    background-repeat: no-repeat;
+  }
+
+  textarea.field__control {
+    resize: vertical;
+    min-height: 9rem;
+  }
+</style>

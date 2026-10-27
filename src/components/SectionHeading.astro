@@ -1,0 +1,47 @@
+---
+interface Props {
+  index?: string;
+  eyebrow?: string;
+  title: string;
+  level?: 'h1' | 'h2' | 'h3';
+  id?: string;
+  class?: string;
+}
+
+const { index, eyebrow, title, level = 'h2', id, class: className } = Astro.props;
+const Heading = level;
+---
+
+<div class:list={['section-heading', className]}>
+  {
+    (index || eyebrow) && (
+      <p class="label section-heading__eyebrow">
+        {index && <span class="section-heading__index">{index}</span>}
+        {eyebrow}
+      </p>
+    )
+  }
+  <Heading id={id}>{title}</Heading>
+  {Astro.slots.has('default') && <div class="section-heading__lede lede"><slot /></div>}
+</div>
+
+<style>
+  .section-heading__eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 0.75em;
+    margin-bottom: var(--space-s);
+  }
+
+  .section-heading__index {
+    color: var(--copper);
+  }
+
+  :global(.on-night) .section-heading__index {
+    color: var(--copper-on-night);
+  }
+
+  .section-heading__lede {
+    margin-top: var(--space-m);
+  }
+</style>

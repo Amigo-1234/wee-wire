@@ -1,0 +1,105 @@
+---
+import '@fontsource-variable/archivo/wdth.css';
+import '@fontsource/ibm-plex-mono/400.css';
+import '@fontsource/ibm-plex-mono/500.css';
+import '@/styles/global.css';
+
+import { business } from '@/config/business';
+import { site } from '@/config/site';
+import { localBusinessSchema } from '@/lib/structuredData';
+import { publicPath } from '@/lib/paths';
+import PrototypeBanner from '@/components/PrototypeBanner.astro';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+
+interface Props {
+  /** Page title, without the brand suffix. Omit for the brand-led home title. */
+  title?: string;
+  description: string;
+  /** Override the share image (path relative to /public). */
+  ogImage?: string;
+  /** Exclude this page from indexing regardless of site settings (e.g. 404). */
+  noindex?: boolean;
+}
+
+const { title, description, ogImage = site.defaultOgImage, noindex = false } = Astro.props;
+
+const brand = business.displayName.value ?? 'Weewire';
+const fullTitle = title ? `${title} | ${brand}` : `${brand} — Network cabling, fiber and data center services`;
+
+const siteUrl = Astro.site ?? new URL(Astro.url.origin);
+const path = publicPath(Astro.url.pathname);
+const canonical = new URL(path, siteUrl).href;
+const robots = site.allowIndexing && !noindex ? 'index, follow' : 'noindex, nofollow';
+const ogImageUrl = new URL(ogImage, siteUrl).href;
+const jsonLd = localBusinessSchema(siteUrl);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="robots" content={robots} />
+    <meta name="theme-color" content="#f4f2ed" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={brand} />
+    <meta property="og:locale" content={site.locale} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <PrototypeBanner />
+    <Header />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <Footer />
+
+    <script>
+      // Reveal-on-scroll for elements marked [data-reveal]. CSS keeps them
+      // visible when JS is unavailable or reduced motion is preferred.
+      const items = document.querySelectorAll<HTMLElement>('[data-reveal]');
+      if ('IntersectionObserver' in window && items.length) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                observer.unobserve(entry.target);
+              }
+            }
+          },
+          { rootMargin: '0px 0px -8% 0px', threshold: 0.12 },
+        );
+        items.forEach((item) => observer.observe(item));
+      } else {
+        items.forEach((item) => item.classList.add('is-visible'));
+      }
+    </script>
+  </body>
+</html>
+
+<style>
+  main:focus {
+    outline: none;
+  }
+</style>

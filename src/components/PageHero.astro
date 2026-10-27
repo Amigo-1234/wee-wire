@@ -1,0 +1,76 @@
+---
+interface Props {
+  eyebrow: string;
+  title: string;
+  lede?: string;
+}
+
+const { eyebrow, title, lede } = Astro.props;
+---
+
+<section class="page-hero">
+  <div class="container page-hero__grid">
+    <div class="page-hero__main">
+      <p class="label page-hero__eyebrow"><span aria-hidden="true">/</span> {eyebrow}</p>
+      <h1>{title}</h1>
+      {lede && <p class="lede page-hero__lede">{lede}</p>}
+      <slot />
+    </div>
+    {Astro.slots.has('aside') && <div class="page-hero__aside"><slot name="aside" /></div>}
+  </div>
+</section>
+
+<style>
+  .page-hero {
+    padding-block: var(--space-2xl) var(--space-xl);
+    border-bottom: 1px solid var(--rule);
+    background:
+      linear-gradient(var(--rule) 1px, transparent 1px) 0 0 / 100% 2rem,
+      var(--paper);
+    background-blend-mode: normal;
+    position: relative;
+  }
+
+  /* Faint ruled-paper texture, masked so it fades out to the right */
+  .page-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--paper);
+    mask: linear-gradient(90deg, #000 30%, rgba(0, 0, 0, 0.82));
+    pointer-events: none;
+  }
+
+  .page-hero__grid {
+    position: relative;
+    display: grid;
+    gap: var(--space-xl);
+    align-items: end;
+  }
+
+  .page-hero__eyebrow {
+    margin-bottom: var(--space-m);
+  }
+
+  .page-hero__eyebrow span {
+    color: var(--copper);
+  }
+
+  .page-hero h1 {
+    max-width: 14em;
+  }
+
+  .page-hero__lede {
+    margin-top: var(--space-m);
+  }
+
+  @media (min-width: 60rem) {
+    .page-hero {
+      padding-block: var(--space-3xl) var(--space-2xl);
+    }
+
+    .page-hero__grid {
+      grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    }
+  }
+</style>

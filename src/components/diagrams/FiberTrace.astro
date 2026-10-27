@@ -1,0 +1,136 @@
+---
+/**
+ * Illustrative fiber trace showing reflective events along a link and a
+ * located fault. Schematic only; no real measurements.
+ */
+interface Props {
+  class?: string;
+  dark?: boolean;
+}
+const { class: className, dark = false } = Astro.props;
+const titleId = `otdr-title-${Math.random().toString(36).slice(2, 8)}`;
+
+// A schematic loss-over-distance trace with a few reflective events.
+const trace =
+  'M 40 70 L 46 40 L 52 78 L 150 98 L 154 84 L 158 104 L 270 126 L 272 132 L 360 150 L 364 128 L 368 156 L 424 168 L 428 120 L 432 250 L 520 252';
+---
+
+<svg class:list={['otdr', { 'otdr--dark': dark }, className]} viewBox="0 0 560 290" role="img" aria-labelledby={titleId} xmlns="http://www.w3.org/2000/svg">
+  <title id={titleId}>Illustration: a fiber trace showing connector and splice events and a fault located along the link</title>
+
+  <g class="otdr__grid">
+    {[0, 1, 2, 3, 4].map((i) => <line x1="40" x2="520" y1={40 + i * 52} y2={40 + i * 52} />)}
+    {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => <line y1="30" y2="250" x1={40 + i * 60} x2={40 + i * 60} />)}
+  </g>
+  <line class="otdr__axis" x1="40" y1="250" x2="520" y2="250" />
+  <line class="otdr__axis" x1="40" y1="30" x2="40" y2="250" />
+  <text class="otdr__axis-label" x="520" y="272" text-anchor="end">DISTANCE →</text>
+  <text class="otdr__axis-label" x="34" y="24">LOSS</text>
+
+  <path class="otdr__trace" d={trace} pathLength="1" fill="none" />
+
+  <g class="otdr__event">
+    <line x1="152" x2="152" y1="76" y2="60" />
+    <text x="152" y="54" text-anchor="middle">CONNECTOR</text>
+  </g>
+  <g class="otdr__event">
+    <line x1="271" x2="271" y1="118" y2="94" />
+    <text x="271" y="88" text-anchor="middle">SPLICE</text>
+  </g>
+  <g class="otdr__event">
+    <line x1="364" x2="364" y1="122" y2="102" />
+    <text x="364" y="96" text-anchor="middle">CONNECTOR</text>
+  </g>
+  <g class="otdr__fault">
+    <line x1="428" x2="428" y1="30" y2="250" />
+    <circle cx="428" cy="120" r="5" />
+    <text x="438" y="44">FAULT LOCATED</text>
+  </g>
+</svg>
+
+<style>
+  .otdr {
+    width: 100%;
+    height: auto;
+    --o-ink: var(--ink);
+    --o-muted: var(--ink-muted);
+    --o-grid: var(--rule);
+  }
+
+  .otdr--dark {
+    --o-ink: var(--night-text);
+    --o-muted: var(--night-muted);
+    --o-grid: var(--night-rule);
+  }
+
+  .otdr text {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    fill: var(--o-muted);
+  }
+
+  .otdr__grid line {
+    stroke: var(--o-grid);
+    stroke-width: 0.75;
+  }
+
+  .otdr__axis {
+    stroke: var(--o-ink);
+    stroke-width: 1;
+  }
+
+  .otdr__trace {
+    stroke: var(--o-ink);
+    stroke-width: 1.75;
+    stroke-linejoin: round;
+  }
+
+  .otdr__event line {
+    stroke: var(--o-muted);
+    stroke-width: 0.75;
+  }
+
+  .otdr__fault line {
+    stroke: var(--copper);
+    stroke-width: 1;
+    stroke-dasharray: 3 3;
+  }
+
+  .otdr__fault circle {
+    fill: none;
+    stroke: var(--copper);
+    stroke-width: 1.75;
+  }
+
+  .otdr .otdr__fault text {
+    fill: var(--copper);
+    font-weight: 500;
+  }
+
+  .otdr--dark .otdr__fault line,
+  .otdr--dark .otdr__fault circle {
+    stroke: var(--copper-on-night);
+  }
+
+  .otdr--dark .otdr__fault text {
+    fill: var(--copper-on-night);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    :global(.js) .otdr__trace {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+    }
+
+    :global(.js .is-visible) .otdr__trace {
+      animation: otdr-draw 1.6s var(--ease-out) forwards;
+    }
+  }
+
+  @keyframes otdr-draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+</style>

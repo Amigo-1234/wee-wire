@@ -1,0 +1,87 @@
+---
+import { business } from '@/config/business';
+import { requestServiceHref } from '@/config/site';
+import Button from './Button.astro';
+import Fact from './Fact.astro';
+
+interface Props {
+  title?: string;
+  text?: string;
+}
+
+const {
+  title = 'Need someone on site?',
+  text = 'Tell us about the work: the site, the systems involved and when you need it done. We will follow up to scope it.',
+} = Astro.props;
+---
+
+<section class="cta on-night" aria-labelledby="cta-title">
+  <div class="container cta__grid" data-reveal>
+    <div>
+      <p class="label">Request service</p>
+      <h2 id="cta-title" class="cta__title">{title}</h2>
+      <p class="lede cta__text">{text}</p>
+    </div>
+    <div class="cta__actions">
+      <Button href={requestServiceHref} arrow>Request service</Button>
+      <dl class="cta__contact">
+        <div>
+          <dt class="label">Email</dt>
+          <dd><Fact fact={business.email} label="Email" kind="email" /></dd>
+        </div>
+        <div>
+          <dt class="label">Phone</dt>
+          <dd><Fact fact={business.phone} label="Phone" kind="phone" /></dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta {
+    padding-block: var(--space-2xl);
+    border-bottom: 1px solid var(--night-rule);
+    background:
+      radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.06) 1px, transparent 0) 0 0 / 24px 24px,
+      var(--night);
+  }
+
+  .cta__grid {
+    display: grid;
+    gap: var(--space-xl);
+    align-items: end;
+  }
+
+  .cta__title {
+    margin-top: var(--space-s);
+    font-size: var(--step-4);
+    max-width: 12em;
+  }
+
+  .cta__text {
+    margin-top: var(--space-m);
+  }
+
+  .cta__actions {
+    display: grid;
+    gap: var(--space-l);
+    justify-items: start;
+  }
+
+  .cta__contact {
+    display: grid;
+    gap: var(--space-s);
+  }
+
+  .cta__contact dd {
+    margin-top: var(--space-3xs);
+    font-size: var(--step-1);
+  }
+
+  @media (min-width: 60rem) {
+    .cta__grid {
+      grid-template-columns: 1.5fr 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,41 @@
+---
+/**
+ * Brand mark. Until the official logo is supplied (business.logo), this is a
+ * plain typeset name — a temporary treatment, not a replacement logo.
+ */
+import { business } from '@/config/business';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+const logo = business.logo.value;
+const name = business.displayName.value ?? 'Weewire';
+---
+
+{
+  logo ? (
+    <img class:list={['wordmark-img', className]} src={logo.src} width={logo.width} height={logo.height} alt={logo.alt} />
+  ) : (
+    <span class:list={['wordmark', className]} data-temporary-logo>
+      {name}
+    </span>
+  )
+}
+
+<style>
+  .wordmark {
+    font-family: var(--font-sans);
+    font-size: 1.375rem;
+    font-weight: 720;
+    font-stretch: 82%;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+
+  .wordmark-img {
+    height: 2rem;
+    width: auto;
+  }
+</style>

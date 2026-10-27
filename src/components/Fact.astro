@@ -1,0 +1,38 @@
+---
+/**
+ * Renders a single business fact with its verification state:
+ * confirmed → value; unverified → value + "pending" marker (prototype);
+ * missing → visible placeholder (prototype) or nothing.
+ */
+import type { Fact as FactType } from '@/config/business';
+import { site } from '@/config/site';
+import { hasValue, needsMarker, telHref } from '@/lib/facts';
+
+interface Props {
+  fact: FactType<string>;
+  /** Human label used in placeholders, e.g. "Phone number". */
+  label: string;
+  kind?: 'text' | 'email' | 'phone';
+  class?: string;
+}
+
+const { fact, label, kind = 'text', class: className } = Astro.props;
+const show = hasValue(fact);
+const value = show ? fact.value : null;
+const href = value && kind === 'email' ? `mailto:${value}` : value && kind === 'phone' ? telHref(value) : null;
+---
+
+{
+  value ? (
+    <span class:list={['fact', className]}>
+      {href ? <a href={href}>{value}</a> : value}
+      {needsMarker(fact) && (
+        <span class="review-tag" title={`Source: ${fact.source}`}>
+          Pending confirmation
+        </span>
+      )}
+    </span>
+  ) : (
+    site.showReviewMarkers && <span class:list={['placeholder', className]}>{label} — awaiting owner</span>
+  )
+}

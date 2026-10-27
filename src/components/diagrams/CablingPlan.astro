@@ -1,0 +1,117 @@
+---
+/** Illustrative floor plan with horizontal cable runs from a telecom room to outlets. */
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+const titleId = `plan-title-${Math.random().toString(36).slice(2, 8)}`;
+
+const outlets: [number, number][] = [
+  [70, 70], [170, 70], [270, 70],
+  [70, 210], [170, 210],
+  [400, 70], [490, 70],
+  [400, 250], [490, 250],
+];
+// Orthogonal runs from the telecom room (at 300,170) along a pathway.
+const runs = outlets.map(([x, y]) => {
+  const trunkY = 150;
+  const start = 'M 316 166';
+  return `${start} L 316 ${trunkY} L ${x} ${trunkY} L ${x} ${y}`;
+});
+---
+
+<svg class:list={['plan', className]} viewBox="0 0 560 320" role="img" aria-labelledby={titleId} xmlns="http://www.w3.org/2000/svg">
+  <title id={titleId}>Illustration: a floor plan with structured cable runs from a telecom room to network outlets</title>
+
+  <g class="plan__walls">
+    <rect x="20" y="20" width="520" height="280" />
+    <line x1="20" y1="130" x2="230" y2="130" />
+    <line x1="230" y1="20" x2="230" y2="130" />
+    <line x1="120" y1="20" x2="120" y2="130" />
+    <line x1="350" y1="20" x2="350" y2="130" />
+    <line x1="350" y1="190" x2="350" y2="300" />
+    <line x1="230" y1="190" x2="540" y2="190" />
+    <line x1="120" y1="190" x2="120" y2="300" />
+  </g>
+
+  <line class="plan__pathway" x1="40" y1="150" x2="520" y2="150" />
+  <text class="plan__label" x="44" y="146">CABLE PATHWAY</text>
+
+  <g class="plan__runs" fill="none">
+    {runs.map((d, i) => <path d={d} pathLength="1" style={`--i:${i}`} />)}
+  </g>
+
+  <g class="plan__room">
+    <rect x="280" y="166" width="72" height="44" />
+    <text x="316" y="192" text-anchor="middle">TELECOM</text>
+  </g>
+
+  <g class="plan__outlets">
+    {outlets.map(([x, y]) => <rect x={x - 6} y={y - 6} width="12" height="12" />)}
+  </g>
+</svg>
+
+<style>
+  .plan {
+    width: 100%;
+    height: auto;
+  }
+
+  .plan text {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    fill: var(--ink-muted);
+  }
+
+  .plan__walls rect,
+  .plan__walls line {
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 2;
+  }
+
+  .plan__pathway {
+    stroke: var(--rule-strong);
+    stroke-width: 10;
+    opacity: 0.45;
+  }
+
+  .plan__runs path {
+    stroke: var(--copper);
+    stroke-width: 1.5;
+    stroke-linejoin: round;
+  }
+
+  .plan__room rect {
+    fill: var(--ink);
+  }
+
+  .plan .plan__room text {
+    fill: var(--paper);
+  }
+
+  .plan__outlets rect {
+    fill: var(--paper-raised);
+    stroke: var(--ink);
+    stroke-width: 1.5;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    :global(.js) .plan__runs path {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+    }
+
+    :global(.js .is-visible) .plan__runs path {
+      animation: plan-draw 1.1s var(--ease-out) forwards;
+      animation-delay: calc(var(--i) * 80ms);
+    }
+  }
+
+  @keyframes plan-draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+</style>

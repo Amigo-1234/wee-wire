@@ -1,0 +1,19 @@
+---
+/** Picks an illustration by key (used by content-driven sections). */
+import RackElevation from './RackElevation.astro';
+import SpineLeaf from './SpineLeaf.astro';
+import FiberTrace from './FiberTrace.astro';
+import CablingPlan from './CablingPlan.astro';
+
+interface Props {
+  name: 'rack' | 'fiber' | 'topology' | 'cabling';
+  class?: string;
+}
+
+const { name, class: className } = Astro.props;
+---
+
+{name === 'rack' && <RackElevation class={className} />}
+{name === 'fiber' && <FiberTrace class={className} />}
+{name === 'topology' && <SpineLeaf class={className} />}
+{name === 'cabling' && <CablingPlan class={className} />}

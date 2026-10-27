@@ -1,0 +1,55 @@
+---
+/**
+ * A clearly marked slot for content the owner still needs to supply.
+ * Rendered only while review markers are enabled; omitted otherwise.
+ */
+import { site } from '@/config/site';
+
+interface Props {
+  title: string;
+  class?: string;
+}
+
+const { title, class: className } = Astro.props;
+---
+
+{
+  site.showReviewMarkers && (
+    <aside class:list={['owner-content', className]} aria-label={`Placeholder: ${title}`}>
+      <p class="label">Owner content needed</p>
+      <p class="owner-content__title">{title}</p>
+      <div class="owner-content__body">
+        <slot />
+      </div>
+    </aside>
+  )
+}
+
+<style>
+  .owner-content {
+    padding: var(--space-m);
+    border: 1px dashed var(--rule-strong);
+    border-radius: var(--radius);
+    background: repeating-linear-gradient(-45deg, transparent 0 8px, rgba(17, 22, 28, 0.03) 8px 16px);
+  }
+
+  .owner-content__title {
+    margin-top: var(--space-2xs);
+    font-weight: 600;
+  }
+
+  .owner-content__body {
+    margin-top: var(--space-2xs);
+    color: var(--ink-muted);
+    font-size: var(--step--1);
+  }
+
+  :global(.on-night) .owner-content {
+    border-color: var(--night-rule);
+    background: repeating-linear-gradient(-45deg, transparent 0 8px, rgba(255, 255, 255, 0.03) 8px 16px);
+  }
+
+  :global(.on-night) .owner-content__body {
+    color: var(--night-muted);
+  }
+</style>
