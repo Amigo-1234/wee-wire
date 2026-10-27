@@ -1,0 +1,326 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/PageHero.astro';
+import Button from '@/components/Button.astro';
+import ReviewTag from '@/components/ReviewTag.astro';
+import CtaBand from '@/components/CtaBand.astro';
+import { site, requestServiceHref } from '@/config/site';
+import { serviceCallRate, cablePulls, cablePullNote, terms, pricingSource } from '@/data/pricing';
+
+const hasUnverified = [serviceCallRate, ...cablePulls, ...terms].some((item) => item.status !== 'confirmed');
+---
+
+<BaseLayout
+  title="Pricing"
+  description="Weewire pricing for service calls, smart-hands requests and CAT6 and CAT5e cable pulls, plus scheduling, cancellation and warranty terms."
+>
+  <PageHero
+    eyebrow="Pricing"
+    title="Rates and terms."
+    lede="Standard rates for service calls and cable pulls. New installations and larger projects are quoted after a site survey."
+  />
+
+  {
+    site.showReviewMarkers && hasUnverified && (
+      <div class="container">
+        <div class="notice" role="note">
+          <p class="label">Pending owner confirmation</p>
+          <p>
+            The figures and terms on this page are carried over from the current weewire.com pricing page as indexed by search engines. They
+            have not yet been confirmed by the owner and must be checked before launch.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  <section class="section section--tight" aria-labelledby="rates-title">
+    <div class="container sheet">
+      <header class="sheet__head" data-reveal>
+        <p class="label">Section A</p>
+        <h2 id="rates-title">Service calls</h2>
+      </header>
+      <div class="sheet__body" data-reveal style="--reveal-delay:80ms">
+        <div class="rate">
+          <p class="rate__figure">
+            <span class="rate__price">{serviceCallRate.price}</span>
+            <span class="rate__unit">{serviceCallRate.unit}</span>
+          </p>
+          <p class="rate__detail">
+            {serviceCallRate.detail}
+            <ReviewTag status={serviceCallRate.status} source={pricingSource} />
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--tight rule-top" aria-labelledby="pulls-title">
+    <div class="container sheet">
+      <header class="sheet__head" data-reveal>
+        <p class="label">Section B</p>
+        <h2 id="pulls-title">Cable pulls</h2>
+      </header>
+      <div class="sheet__body" data-reveal style="--reveal-delay:80ms">
+        <div class="table-wrap">
+          <table class="spec-table" role="table">
+            <caption class="visually-hidden">Cable pull pricing by cable type</caption>
+            <thead role="rowgroup">
+              <tr role="row">
+                <th scope="col" role="columnheader">Cable</th>
+                <th scope="col" role="columnheader">Run length</th>
+                <th scope="col" role="columnheader">Working height</th>
+                <th scope="col" role="columnheader" class="num">Price per pull</th>
+              </tr>
+            </thead>
+            <tbody role="rowgroup">
+              {
+                cablePulls.map((pull) => (
+                  <tr role="row">
+                    <th scope="row" role="rowheader">{pull.cable}</th>
+                    <td role="cell" data-label="Run length">{pull.maxLength}</td>
+                    <td role="cell" data-label="Working height">{pull.maxHeight}</td>
+                    <td role="cell" class="num" data-label="Price per pull">
+                      <span class="spec-table__price">{pull.price}</span>
+                      <ReviewTag status={pull.status} source={pricingSource} />
+                    </td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+        <p class="sheet__note">{cablePullNote}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--tight rule-top" aria-labelledby="terms-title">
+    <div class="container sheet">
+      <header class="sheet__head" data-reveal>
+        <p class="label">Section C</p>
+        <h2 id="terms-title">Terms</h2>
+      </header>
+      <div class="sheet__body" data-reveal style="--reveal-delay:80ms">
+        <dl class="terms">
+          {
+            terms.map((term) => (
+              <div class="terms__row">
+                <dt>{term.term}</dt>
+                <dd>
+                  {term.detail}
+                  <ReviewTag status={term.status} source={pricingSource} />
+                </dd>
+              </div>
+            ))
+          }
+        </dl>
+        <div class="sheet__actions">
+          <Button href={requestServiceHref} arrow>Request a quote or service call</Button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <CtaBand title="Need a quote for a larger job?" text="Send the site details and what needs to be done. New installations start with a site survey." />
+</BaseLayout>
+
+<style>
+  .notice {
+    margin-top: var(--space-xl);
+    padding: var(--space-m);
+    border: 1px dashed #b98a2e;
+    border-radius: var(--radius);
+    background: #fff6dc;
+    color: #4d3a10;
+    font-size: var(--step--1);
+    max-width: 52rem;
+  }
+
+  .notice .label {
+    color: #7a5200;
+    margin-bottom: var(--space-2xs);
+  }
+
+  .sheet {
+    display: grid;
+    gap: var(--space-l) var(--space-2xl);
+  }
+
+  .sheet__head h2 {
+    margin-top: var(--space-2xs);
+    font-size: var(--step-3);
+  }
+
+  @media (min-width: 60rem) {
+    .sheet {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 2.2fr);
+    }
+  }
+
+  .rate {
+    border-top: 1px solid var(--ink);
+    padding-top: var(--space-m);
+  }
+
+  .rate__figure {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-s);
+  }
+
+  .rate__price {
+    font-size: var(--step-5);
+    font-weight: 650;
+    font-stretch: 85%;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .rate__unit {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-muted);
+  }
+
+  .rate__detail {
+    margin-top: var(--space-s);
+    color: var(--ink-soft);
+  }
+
+  .sheet > * {
+    min-width: 0;
+  }
+
+  .spec-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--step--1);
+  }
+
+  .spec-table thead th {
+    padding: 0 var(--space-s) var(--space-xs) 0;
+    border-bottom: 1px solid var(--ink);
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    text-align: left;
+  }
+
+  .spec-table tbody th,
+  .spec-table td {
+    padding: var(--space-s) var(--space-s) var(--space-s) 0;
+    border-bottom: 1px solid var(--rule);
+    text-align: left;
+    vertical-align: baseline;
+  }
+
+  .spec-table tbody th {
+    font-size: var(--step-1);
+    font-weight: 620;
+  }
+
+  .spec-table .num {
+    text-align: right;
+    padding-right: 0;
+  }
+
+  .spec-table__price {
+    font-size: var(--step-2);
+    font-weight: 650;
+    font-stretch: 88%;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Small screens: each row becomes a labelled block instead of scrolling sideways. */
+  @media (max-width: 39.99rem) {
+    .spec-table thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+    }
+
+    .spec-table,
+    .spec-table tbody,
+    .spec-table tr,
+    .spec-table th,
+    .spec-table td {
+      display: block;
+    }
+
+    .spec-table tr {
+      padding-block: var(--space-s);
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .spec-table tbody th,
+    .spec-table td {
+      border: 0;
+      padding: 0.2rem 0;
+    }
+
+    .spec-table td {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.25rem 1rem;
+    }
+
+    .spec-table td::before {
+      content: attr(data-label);
+      font-family: var(--font-mono);
+      font-size: var(--step--2);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+    }
+
+    .spec-table .num {
+      text-align: left;
+    }
+  }
+
+  .sheet__note {
+    margin-top: var(--space-s);
+    font-size: var(--step--1);
+    color: var(--ink-muted);
+  }
+
+  .terms {
+    border-top: 1px solid var(--ink);
+  }
+
+  .terms__row {
+    display: grid;
+    gap: var(--space-3xs) var(--space-l);
+    padding-block: var(--space-s);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .terms__row dt {
+    font-weight: 600;
+  }
+
+  .terms__row dd {
+    color: var(--ink-soft);
+  }
+
+  @media (min-width: 40rem) {
+    .terms__row {
+      grid-template-columns: 11rem 1fr;
+    }
+  }
+
+  .sheet__actions {
+    margin-top: var(--space-l);
+  }
+</style>

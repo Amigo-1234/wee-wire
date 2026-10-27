@@ -1,0 +1,582 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Button from '@/components/Button.astro';
+import Fact from '@/components/Fact.astro';
+import ReviewTag from '@/components/ReviewTag.astro';
+import SectionHeading from '@/components/SectionHeading.astro';
+import CtaBand from '@/components/CtaBand.astro';
+import RackElevation from '@/components/diagrams/RackElevation.astro';
+import SpineLeaf from '@/components/diagrams/SpineLeaf.astro';
+import { business } from '@/config/business';
+import { requestServiceHref } from '@/config/site';
+import { serviceCallRate, cablePulls, terms, pricingSource } from '@/data/pricing';
+
+const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
+const core = services.filter((s) => s.data.tier === 'core');
+const additional = services.filter((s) => s.data.tier === 'additional');
+const dataCenter = services.find((s) => s.id === 'data-center-deployment');
+const license = business.licenses[0];
+const minimum = terms.find((t) => t.term === 'Minimum');
+const survey = terms.find((t) => t.term === 'Site surveys');
+const deposit = terms.find((t) => t.term === 'Deposit');
+---
+
+<BaseLayout
+  description="Weewire provides structured network cabling, fiber optic troubleshooting, data center deployment, and on-site service calls and smart-hands support for businesses."
+>
+  <!-- Hero ------------------------------------------------------------- -->
+  <section class="hero">
+    <div class="container hero__grid">
+      <div class="hero__copy">
+        <p class="label hero__eyebrow">Low-voltage &amp; network infrastructure</p>
+        <h1 class="hero__title">Network infrastructure, built right and kept running.</h1>
+        <p class="lede hero__lede">
+          Structured cabling, fiber troubleshooting, data center deployment and on-site technical support for businesses.
+        </p>
+        <div class="hero__actions">
+          <Button href={requestServiceHref} arrow>Request service</Button>
+          <Button href="/services" variant="secondary">View services</Button>
+        </div>
+
+        <dl class="hero__specs">
+          {
+            license?.value && (
+              <div>
+                <dt class="label">License</dt>
+                <dd>
+                  {license.value.label} <span class="hero__spec-sub">· {license.value.classification.split(' ')[0]}</span>
+                  <ReviewTag status={license.status} source={license.source} />
+                </dd>
+              </div>
+            )
+          }
+          <div>
+            <dt class="label">Dispatch</dt>
+            <dd><Fact fact={business.email} label="Email" kind="email" /></dd>
+          </div>
+          <div>
+            <dt class="label">Support</dt>
+            <dd><Fact fact={business.onCallSupport} label="Support hours" /></dd>
+          </div>
+        </dl>
+      </div>
+
+      <figure class="hero__drawing">
+        <div class="hero__sheet">
+          <RackElevation />
+        </div>
+        <figcaption class="hero__titleblock">
+          <span><span class="label">Dwg</span> Typical rack elevation</span>
+          <span class="label">Illustrative</span>
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- Services index ----------------------------------------------------- -->
+  <section class="section" aria-labelledby="services-title">
+    <div class="container">
+      <div class="services-intro" data-reveal>
+        <SectionHeading index="01" eyebrow="Services" title="The physical layer, handled." id="services-title">
+          From the first cable pull to a technician at the rack when something stops working.
+        </SectionHeading>
+        <Button href="/services" variant="quiet" arrow>All services</Button>
+      </div>
+
+      <ol class="svc-rows" role="list">
+        {
+          core.map((service, i) => (
+            <li class="svc-row" data-reveal style={`--reveal-delay:${i * 60}ms`}>
+              <a class="svc-row__link" href={`/services#${service.id}`}>
+                <span class="svc-row__num label">{String(i + 1).padStart(2, '0')}</span>
+                <span class="svc-row__main">
+                  <span class="svc-row__title">{service.data.title}</span>
+                  <span class="svc-row__summary">{service.data.summary}</span>
+                </span>
+                <span class="svc-row__scope">
+                  {service.data.scope.slice(0, 3).map((item) => (
+                    <span>{item}</span>
+                  ))}
+                </span>
+                <span class="svc-row__arrow" aria-hidden="true">→</span>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+
+      {
+        additional.length > 0 && (
+          <div class="also" data-reveal>
+            <p class="label">Also available</p>
+            <ul class="also__list">
+              {additional.map((service) => (
+                <li>
+                  <a href={`/services#${service.id}`}>{service.data.title}</a>
+                  {service.data.qualifier && <span class="also__qualifier">{service.data.qualifier}</span>}
+                </li>
+              ))}
+            </ul>
+            <ReviewTag status="unverified" text="Service list pending confirmation" />
+          </div>
+        )
+      }
+    </div>
+  </section>
+
+  <!-- Data center feature -------------------------------------------------- -->
+  {
+    dataCenter && (
+      <section class="section on-night feature" aria-labelledby="dc-title">
+        <div class="container feature__grid">
+          <div class="feature__copy" data-reveal>
+            <SectionHeading index="02" eyebrow="Data center deployment" title="Racked, cabled and patched to plan." id="dc-title">
+              {dataCenter.data.summary}
+            </SectionHeading>
+            <ul class="feature__list">
+              {dataCenter.data.scope.map((item) => (
+                <li>{item}</li>
+              ))}
+            </ul>
+            <Button href={`/services#${dataCenter.id}`} variant="secondary" arrow>
+              Data center services
+            </Button>
+          </div>
+          <figure class="feature__figure" data-reveal style="--reveal-delay:120ms">
+            <SpineLeaf />
+            <figcaption class="label">Fig. — Spine-and-leaf fabric, illustrative</figcaption>
+          </figure>
+        </div>
+      </section>
+    )
+  }
+
+  <!-- How work starts ------------------------------------------------------ -->
+  <section class="section process" aria-labelledby="process-title">
+    <div class="container">
+      <div data-reveal>
+        <SectionHeading index="03" eyebrow="Getting started" title="How a job gets started." id="process-title" />
+      </div>
+      <ol class="steps" role="list">
+        <li class="step" data-reveal>
+          <span class="step__num label">Step 01</span>
+          <h3>Send the details</h3>
+          <p>Use the request form or email dispatch with the site, the systems involved and your timing.</p>
+        </li>
+        <li class="step" data-reveal style="--reveal-delay:80ms">
+          <span class="step__num label">Step 02</span>
+          <h3>Survey and quote</h3>
+          <p>
+            {survey?.detail}
+            {survey && <ReviewTag status={survey.status} source={pricingSource} />}
+          </p>
+        </li>
+        <li class="step" data-reveal style="--reveal-delay:160ms">
+          <span class="step__num label">Step 03</span>
+          <h3>Scheduled work</h3>
+          <p>
+            Work is scheduled once the scope is agreed. {deposit?.detail}
+            {deposit && <ReviewTag status={deposit.status} source={pricingSource} />}
+          </p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- Pricing snapshot ----------------------------------------------------- -->
+  <section class="section section--tight rule-top" aria-labelledby="pricing-title">
+    <div class="container pricing-snap">
+      <div data-reveal>
+        <SectionHeading index="04" eyebrow="Pricing" title="Published rates, up front." id="pricing-title">
+          Standard rates for service calls and cable pulls. Larger installations are quoted after a site survey.
+        </SectionHeading>
+      </div>
+      <div class="pricing-snap__sheet" data-reveal style="--reveal-delay:100ms">
+        <dl class="rates">
+          <div class="rates__row">
+            <dt>{serviceCallRate.label}</dt>
+            <dd>
+              <span class="rates__price">{serviceCallRate.price}</span>
+              <span class="rates__unit">{serviceCallRate.unit}</span>
+            </dd>
+          </div>
+          {
+            cablePulls.map((pull) => (
+              <div class="rates__row">
+                <dt>{pull.cable} cable pull</dt>
+                <dd>
+                  <span class="rates__price">{pull.price}</span>
+                  <span class="rates__unit">per pull</span>
+                </dd>
+              </div>
+            ))
+          }
+        </dl>
+        <p class="rates__note">
+          {minimum?.detail} Cable pull pricing applies up to 300 ft and 14 ft working height.
+          <ReviewTag status="unverified" source={pricingSource} />
+        </p>
+        <Button href="/pricing" variant="quiet" arrow>Full pricing and terms</Button>
+      </div>
+    </div>
+  </section>
+
+  <CtaBand />
+</BaseLayout>
+
+<style>
+  /* Hero */
+  .hero {
+    padding-block: var(--space-l) var(--space-2xl);
+    border-bottom: 1px solid var(--rule);
+    overflow: hidden;
+  }
+
+  .hero__grid {
+    display: grid;
+    gap: var(--space-2xl);
+    align-items: center;
+  }
+
+  .hero__eyebrow {
+    margin-bottom: var(--space-m);
+  }
+
+  .hero__title {
+    max-width: 11.5em;
+  }
+
+  .hero__lede {
+    margin-top: var(--space-m);
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-s);
+    margin-top: var(--space-l);
+  }
+
+  .hero__specs {
+    display: grid;
+    margin-top: var(--space-xl);
+    border-top: 1px solid var(--ink);
+  }
+
+  .hero__specs > div {
+    display: grid;
+    grid-template-columns: 6.5rem 1fr;
+    gap: var(--space-s);
+    align-items: baseline;
+    padding-block: 0.7rem;
+    border-bottom: 1px solid var(--rule);
+    font-size: var(--step--1);
+  }
+
+  .hero__spec-sub {
+    color: var(--ink-muted);
+  }
+
+  .hero__drawing {
+    position: relative;
+    border: 1px solid var(--ink);
+    background: var(--paper-raised);
+  }
+
+  .hero__sheet {
+    padding: var(--space-l) var(--space-m) var(--space-m);
+    background:
+      linear-gradient(var(--paper-sunk) 1px, transparent 1px) 0 0 / 24px 24px,
+      linear-gradient(90deg, var(--paper-sunk) 1px, transparent 1px) 0 0 / 24px 24px;
+  }
+
+  .hero__titleblock {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-s);
+    padding: 0.6rem var(--space-s);
+    border-top: 1px solid var(--ink);
+    font-size: var(--step--1);
+    font-weight: 500;
+  }
+
+  .hero__titleblock .label {
+    margin-right: 0.5em;
+  }
+
+  @media (min-width: 60rem) {
+    .hero {
+      padding-block: var(--space-xl) var(--space-2xl);
+    }
+
+    .hero__grid {
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    }
+  }
+
+  /* Services rows */
+  .services-intro {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: var(--space-m) var(--space-xl);
+    margin-bottom: var(--space-xl);
+  }
+
+  .svc-rows {
+    list-style: none;
+    padding: 0;
+    border-top: 1px solid var(--ink);
+  }
+
+  .svc-row {
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .svc-row__link {
+    display: grid;
+    grid-template-columns: 2.5rem 1fr auto;
+    gap: var(--space-2xs) var(--space-m);
+    padding-block: var(--space-m);
+    text-decoration: none;
+    transition: background-color 200ms ease;
+  }
+
+  .svc-row__num {
+    padding-top: 0.45em;
+    color: var(--copper);
+  }
+
+  .svc-row__main {
+    display: grid;
+    gap: var(--space-2xs);
+  }
+
+  .svc-row__title {
+    font-size: var(--step-2);
+    font-weight: 620;
+    font-stretch: 88%;
+    letter-spacing: -0.015em;
+    line-height: 1.15;
+  }
+
+  .svc-row__summary {
+    color: var(--ink-soft);
+    max-width: 34em;
+  }
+
+  .svc-row__scope {
+    display: none;
+  }
+
+  .svc-row__arrow {
+    align-self: center;
+    font-size: var(--step-2);
+    transition: transform 240ms var(--ease-out);
+  }
+
+  .svc-row__link:hover .svc-row__arrow,
+  .svc-row__link:focus-visible .svc-row__arrow {
+    transform: translateX(6px);
+    color: var(--copper);
+  }
+
+  .svc-row__link:hover .svc-row__title {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.18em;
+    text-decoration-color: var(--copper);
+  }
+
+  @media (min-width: 60rem) {
+    .svc-row__link {
+      grid-template-columns: 4rem minmax(0, 1.3fr) minmax(0, 1fr) 2rem;
+      padding-block: var(--space-l);
+    }
+
+    .svc-row__scope {
+      display: grid;
+      gap: 0.3rem;
+      align-content: start;
+      padding-top: 0.35rem;
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      color: var(--ink-muted);
+    }
+
+    .svc-row__scope span::before {
+      content: '— ';
+      color: var(--rule-strong);
+    }
+  }
+
+  .also {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-s) var(--space-l);
+    margin-top: var(--space-l);
+  }
+
+  .also__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs) var(--space-l);
+    list-style: none;
+    padding: 0;
+  }
+
+  .also__list a {
+    font-weight: 500;
+  }
+
+  .also__qualifier {
+    margin-left: 0.5em;
+    font-size: var(--step--1);
+    color: var(--ink-muted);
+  }
+
+  /* Data center feature */
+  .feature__grid {
+    display: grid;
+    gap: var(--space-2xl);
+    align-items: center;
+  }
+
+  .feature__list {
+    list-style: none;
+    padding: 0;
+    margin-block: var(--space-l);
+    border-top: 1px solid var(--night-rule);
+  }
+
+  .feature__list li {
+    padding-block: 0.65rem;
+    border-bottom: 1px solid var(--night-rule);
+  }
+
+  .feature__list li::before {
+    content: '+';
+    display: inline-block;
+    width: 1.5rem;
+    font-family: var(--font-mono);
+    color: var(--copper-on-night);
+  }
+
+  .feature__figure figcaption {
+    margin-top: var(--space-s);
+  }
+
+  @media (min-width: 60rem) {
+    .feature__grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+    }
+  }
+
+  /* Process */
+  .process {
+    background: var(--paper-sunk);
+  }
+
+  .steps {
+    display: grid;
+    gap: var(--space-l);
+    list-style: none;
+    padding: 0;
+    margin-top: var(--space-xl);
+    counter-reset: step;
+  }
+
+  .step {
+    position: relative;
+    padding-top: var(--space-m);
+    border-top: 2px solid var(--ink);
+  }
+
+  .step::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: 0;
+    width: 10px;
+    height: 10px;
+    background: var(--copper);
+  }
+
+  .step h3 {
+    margin-top: var(--space-xs);
+  }
+
+  .step p {
+    margin-top: var(--space-xs);
+    color: var(--ink-soft);
+  }
+
+  @media (min-width: 48rem) {
+    .steps {
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-l);
+    }
+  }
+
+  /* Pricing snapshot */
+  .pricing-snap {
+    display: grid;
+    gap: var(--space-xl);
+  }
+
+  .rates {
+    border-top: 1px solid var(--ink);
+  }
+
+  .rates__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--space-m);
+    padding-block: var(--space-s);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .rates__row dt {
+    font-weight: 500;
+  }
+
+  .rates__row dd {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5em;
+    white-space: nowrap;
+  }
+
+  .rates__price {
+    font-size: var(--step-3);
+    font-weight: 650;
+    font-stretch: 88%;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .rates__unit {
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    color: var(--ink-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .rates__note {
+    margin-block: var(--space-m);
+    font-size: var(--step--1);
+    color: var(--ink-muted);
+  }
+
+  @media (min-width: 60rem) {
+    .pricing-snap {
+      grid-template-columns: 1fr 1fr;
+      align-items: start;
+    }
+  }
+</style>

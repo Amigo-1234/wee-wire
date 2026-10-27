@@ -1,0 +1,114 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/PageHero.astro';
+import Fact from '@/components/Fact.astro';
+import { business } from '@/config/business';
+import { site } from '@/config/site';
+
+const name = business.legalName.value ?? business.displayName.value ?? 'Weewire';
+---
+
+<BaseLayout
+  title="Privacy policy"
+  description="How Weewire handles information submitted through this website, including service request details."
+>
+  <PageHero eyebrow="Legal" title="Privacy policy." />
+
+  <section class="section section--tight">
+    <div class="container privacy">
+      {
+        site.showReviewMarkers && (
+          <div class="draft" role="note">
+            <p class="label">Draft — not yet approved</p>
+            <p>
+              This policy is a starting draft that describes how this website is built. It must be reviewed and approved by the business owner,
+              with appropriate legal advice, before launch. Retention periods, service providers and the effective date are still to be
+              confirmed.
+            </p>
+          </div>
+        )
+      }
+
+      <div class="prose">
+        <p>
+          <strong>Effective date:</strong> <span class="placeholder">to be set at launch</span>
+        </p>
+
+        <h2>Who we are</h2>
+        <p>
+          This website is operated by {name}. Questions about this policy can be sent to <Fact fact={business.email} label="Email" kind="email" />.
+        </p>
+
+        <h2>Information you give us</h2>
+        <p>When you send a service request through the form on this website, we ask for:</p>
+        <ul>
+          <li>your name, and optionally your company name;</li>
+          <li>your email address, and optionally your phone number;</li>
+          <li>the service you need, the site location and the type of request;</li>
+          <li>any details you choose to include about the work.</li>
+        </ul>
+        <p>Please do not include passwords, network credentials or other sensitive information in the form.</p>
+
+        <h2>How we use it</h2>
+        <p>
+          We use the information you submit to respond to your request, to scope, quote and schedule work, and to keep a record of our
+          correspondence with you.
+        </p>
+
+        <h2>Information collected automatically</h2>
+        <p>
+          This website does not use analytics, advertising or tracking cookies. Fonts and other assets are served from this website rather than
+          third-party services. Like most websites, our hosting provider may process technical information such as IP addresses in server
+          logs in order to deliver and protect the site.
+        </p>
+
+        <h2>Sharing</h2>
+        <p>
+          We do not sell your information. Request details may be processed by the service providers we use to receive form submissions and
+          email, solely so we can respond to you.
+        </p>
+
+        <h2>Retention</h2>
+        <p><span class="placeholder">Retention period — awaiting owner</span></p>
+
+        <h2>Your choices</h2>
+        <p>
+          You can ask us what information we hold about you, or ask us to correct or delete it, by contacting <Fact
+            fact={business.email}
+            label="Email"
+            kind="email"
+          />.
+        </p>
+
+        <h2>Changes to this policy</h2>
+        <p>If we change how we handle information, we will update this page and its effective date.</p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .privacy {
+    display: grid;
+    gap: var(--space-xl);
+    max-width: 48rem;
+  }
+
+  .draft {
+    padding: var(--space-m);
+    border: 1px dashed #b98a2e;
+    border-radius: var(--radius);
+    background: #fff6dc;
+    color: #4d3a10;
+    font-size: var(--step--1);
+  }
+
+  .draft .label {
+    color: #7a5200;
+    margin-bottom: var(--space-2xs);
+  }
+
+  .prose h2 {
+    font-size: var(--step-2);
+  }
+</style>

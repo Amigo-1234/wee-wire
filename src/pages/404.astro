@@ -1,0 +1,91 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Button from '@/components/Button.astro';
+import { requestServiceHref } from '@/config/site';
+---
+
+<BaseLayout title="Page not found" description="The page you were looking for could not be found." noindex>
+  <section class="nf">
+    <div class="container nf__grid">
+      <div>
+        <p class="label nf__code">Error 404 · No link</p>
+        <h1>Signal lost.</h1>
+        <p class="lede nf__lede">The page you were looking for isn't here. It may have moved when the site was rebuilt.</p>
+        <div class="nf__actions">
+          <Button href="/" arrow>Back to home</Button>
+          <Button href="/services" variant="secondary">Services</Button>
+          <Button href={requestServiceHref} variant="quiet">Request service</Button>
+        </div>
+      </div>
+
+      <svg class="nf__art" viewBox="0 0 360 160" aria-hidden="true" focusable="false">
+        <path class="nf__cable" d="M 0 80 H 120 C 140 80 146 60 158 60" />
+        <path class="nf__cable" d="M 360 80 H 240 C 220 80 214 104 200 104" />
+        <rect class="nf__plug" x="156" y="50" width="22" height="20" />
+        <rect class="nf__plug" x="182" y="94" width="20" height="20" />
+        <path class="nf__gap" d="M 186 64 l 10 -10 M 176 112 l -10 10 M 190 78 l 12 4" />
+      </svg>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .nf {
+    padding-block: var(--space-3xl);
+    min-height: 60vh;
+    display: grid;
+    align-items: center;
+  }
+
+  .nf__grid {
+    display: grid;
+    gap: var(--space-2xl);
+    align-items: center;
+  }
+
+  .nf__code {
+    margin-bottom: var(--space-m);
+    color: var(--copper);
+  }
+
+  .nf__lede {
+    margin-top: var(--space-m);
+  }
+
+  .nf__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-s) var(--space-m);
+    margin-top: var(--space-l);
+  }
+
+  .nf__art {
+    width: 100%;
+    max-width: 28rem;
+  }
+
+  .nf__cable {
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 3;
+  }
+
+  .nf__plug {
+    fill: var(--paper-raised);
+    stroke: var(--ink);
+    stroke-width: 2;
+  }
+
+  .nf__gap {
+    stroke: var(--copper);
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+
+  @media (min-width: 60rem) {
+    .nf__grid {
+      grid-template-columns: 1.2fr 1fr;
+    }
+  }
+</style>

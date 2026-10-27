@@ -1,0 +1,536 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/PageHero.astro';
+import Button from '@/components/Button.astro';
+import Fact from '@/components/Fact.astro';
+import FormField from '@/components/FormField.astro';
+import { business } from '@/config/business';
+import { site } from '@/config/site';
+import { addressAsText } from '@/lib/facts';
+
+const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
+const serviceOptions = [
+  ...services.map((s) => ({ value: s.data.title, label: s.data.title })),
+  { value: 'Other / not sure', label: 'Other / not sure' },
+];
+const endpoint = site.formEndpoint;
+---
+
+<BaseLayout
+  title="Contact and request service"
+  description="Request a service call, site survey or quote from Weewire for network cabling, fiber troubleshooting, data center deployment or on-site support."
+>
+  <PageHero
+    eyebrow="Contact"
+    title="Request service."
+    lede="Tell us what needs doing and where. Include as much detail as you can about the site and the systems involved."
+  />
+
+  <section class="section section--tight">
+    <div class="container contact-grid">
+      <div class="contact-main">
+        <h2 id="request" class="form-title">Service request</h2>
+
+        {
+          !endpoint && (
+            <div class="form-notice" role="note">
+              <p class="label">Prototype form</p>
+              <p>
+                This form is not connected to a delivery service yet. You can fill it in to try it out, but <strong>nothing will be sent</strong>.
+              </p>
+            </div>
+          )
+        }
+
+        <div class="error-summary" role="alert" tabindex="-1" hidden data-error-summary>
+          <h3 class="error-summary__title">Please check the following:</h3>
+          <ul data-error-list></ul>
+        </div>
+
+        <form class="form" method="post" action={endpoint ?? undefined} novalidate data-request-form data-endpoint={endpoint ?? ''} aria-labelledby="request">
+          <fieldset class="form__group">
+            <legend class="label">01 — Your details</legend>
+            <div class="form__row">
+              <FormField id="name" label="Name" required autocomplete="name" />
+              <FormField id="company" label="Company" autocomplete="organization" />
+            </div>
+            <div class="form__row">
+              <FormField id="email" label="Email" type="email" required autocomplete="email" inputmode="email" />
+              <FormField id="phone" label="Phone" type="tel" autocomplete="tel" inputmode="tel" />
+            </div>
+          </fieldset>
+
+          <fieldset class="form__group">
+            <legend class="label">02 — The work</legend>
+            <FormField id="service" label="Service needed" as="select" required placeholderOption="Select a service" options={serviceOptions} />
+            <FormField id="location" label="Site location" hint="City, or the site address if you have it." autocomplete="off" />
+
+            <fieldset class="choice">
+              <legend class="choice__legend">Type of request <span class="choice__opt">Optional</span></legend>
+              <div class="choice__options">
+                <label class="choice__option">
+                  <input type="radio" name="request_type" value="Planned work or new installation" />
+                  <span>Planned work or new installation</span>
+                </label>
+                <label class="choice__option">
+                  <input type="radio" name="request_type" value="Something is not working" />
+                  <span>Something is not working</span>
+                </label>
+                <label class="choice__option">
+                  <input type="radio" name="request_type" value="Quote or site survey" />
+                  <span>Quote or site survey</span>
+                </label>
+              </div>
+            </fieldset>
+
+            <FormField
+              id="details"
+              label="Details"
+              as="textarea"
+              required
+              minlength={20}
+              hint="What needs doing, the equipment involved, access requirements and your timing."
+            />
+          </fieldset>
+
+          <!-- Spam trap: hidden from people and assistive tech; bots tend to fill it. -->
+          <div class="form__trap" aria-hidden="true">
+            <label for="website">Leave this field empty</label>
+            <input id="website" name="website" type="text" tabindex="-1" autocomplete="off" />
+          </div>
+
+          <div class="form__submit">
+            <Button type="submit" arrow data-submit>Send request</Button>
+            <p class="form__privacy">
+              See the <a href="/privacy">privacy policy</a> for how request details are handled.
+            </p>
+          </div>
+
+          <div class="form-status" role="status" aria-live="polite" tabindex="-1" hidden data-form-status></div>
+        </form>
+      </div>
+
+      <aside class="contact-aside" aria-labelledby="direct-title">
+        <div class="aside-block">
+          <h2 id="direct-title" class="label">Contact directly</h2>
+          <dl class="direct">
+            <div>
+              <dt>Email</dt>
+              <dd><Fact fact={business.email} label="Email" kind="email" /></dd>
+            </div>
+            <div>
+              <dt>Phone</dt>
+              <dd><Fact fact={business.phone} label="Phone" kind="phone" /></dd>
+            </div>
+            <div>
+              <dt>Support</dt>
+              <dd><Fact fact={business.onCallSupport} label="Support hours" /></dd>
+            </div>
+            <div>
+              <dt>Address</dt>
+              <dd><Fact fact={addressAsText(business.address)} label="New business address" /></dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="aside-block">
+          <h2 class="label">Helpful to include</h2>
+          <ul class="checklist" role="list">
+            <li>Site address and how to access it</li>
+            <li>Equipment or systems involved</li>
+            <li>Number of cable runs, if known</li>
+            <li>Photos or drawings, if you have them</li>
+            <li>When the work needs to happen</li>
+          </ul>
+        </div>
+
+        <div class="aside-block aside-block--rates">
+          <h2 class="label">Rates</h2>
+          <p>Service-call and cable-pull rates are published on the pricing page.</p>
+          <Button href="/pricing" variant="quiet" arrow>View pricing</Button>
+        </div>
+      </aside>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-request-form]');
+  const summary = document.querySelector<HTMLElement>('[data-error-summary]');
+  const summaryList = document.querySelector<HTMLUListElement>('[data-error-list]');
+  const status = document.querySelector<HTMLElement>('[data-form-status]');
+
+  type Control = HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
+
+  if (form && summary && summaryList && status) {
+    const endpoint = form.dataset.endpoint || '';
+    const submit = form.querySelector<HTMLButtonElement>('[data-submit]');
+    const controls = Array.from(form.querySelectorAll<Control>('.field__control'));
+    let attempted = false;
+
+    const labelText = (control: Control) =>
+      form.querySelector(`label[for="${control.id}"]`)?.firstChild?.textContent?.trim() ?? control.name;
+
+    const messageFor = (control: Control): string => {
+      const label = labelText(control);
+      const v = control.validity;
+      if (v.valueMissing) return control.tagName === 'SELECT' ? `Select the ${label.toLowerCase()}.` : `Enter your ${label.toLowerCase()}.`;
+      if (v.typeMismatch && control.type === 'email') return 'Enter an email address in the format name@example.com.';
+      if (v.tooShort && 'minLength' in control) return `${label} needs at least ${control.minLength} characters.`;
+      return v.valid ? '' : `Check the ${label.toLowerCase()}.`;
+    };
+
+    const setError = (control: Control, message: string) => {
+      const error = document.getElementById(control.dataset.errorId ?? '');
+      if (!error) return;
+      const describedBy = (control.getAttribute('aria-describedby') ?? '').split(' ').filter((id) => id && id !== error.id);
+      if (message) {
+        error.textContent = message;
+        error.hidden = false;
+        control.setAttribute('aria-invalid', 'true');
+        control.setAttribute('aria-describedby', [error.id, ...describedBy].join(' '));
+      } else {
+        error.textContent = '';
+        error.hidden = true;
+        control.removeAttribute('aria-invalid');
+        if (describedBy.length) control.setAttribute('aria-describedby', describedBy.join(' '));
+        else control.removeAttribute('aria-describedby');
+      }
+    };
+
+    const validate = (control: Control) => {
+      // Trim whitespace-only answers so they count as missing.
+      if (control.tagName !== 'SELECT' && control.value.trim() === '' && control.value !== '') control.value = '';
+      const message = messageFor(control);
+      setError(control, message);
+      return message;
+    };
+
+    controls.forEach((control) => {
+      control.addEventListener('blur', () => attempted && validate(control));
+      control.addEventListener('input', () => control.getAttribute('aria-invalid') === 'true' && validate(control));
+    });
+
+    const showStatus = (kind: 'success' | 'info' | 'error', title: string, body: string) => {
+      status.hidden = false;
+      status.className = `form-status form-status--${kind}`;
+      status.innerHTML = '';
+      const strong = document.createElement('p');
+      strong.className = 'form-status__title';
+      strong.textContent = title;
+      const p = document.createElement('p');
+      p.textContent = body;
+      status.append(strong, p);
+      status.focus();
+    };
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      attempted = true;
+      status.hidden = true;
+
+      const errors = controls.map((c) => ({ control: c, message: validate(c) })).filter((e) => e.message);
+      summaryList.innerHTML = '';
+      if (errors.length) {
+        for (const { control, message } of errors) {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+          a.href = `#${control.id}`;
+          a.textContent = message;
+          a.addEventListener('click', (e) => {
+            e.preventDefault();
+            control.focus();
+          });
+          li.append(a);
+          summaryList.append(li);
+        }
+        summary.hidden = false;
+        summary.focus();
+        return;
+      }
+      summary.hidden = true;
+
+      const data = new FormData(form);
+      if (String(data.get('website') ?? '') !== '') return; // spam trap filled
+
+      if (!endpoint) {
+        showStatus(
+          'info',
+          'Not sent — this is a prototype.',
+          'Your entries passed validation, but this form is not connected to a delivery service yet, so nothing was transmitted or stored. Please use the contact details on this page instead.',
+        );
+        return;
+      }
+
+      if (submit) {
+        submit.disabled = true;
+        submit.setAttribute('aria-busy', 'true');
+      }
+      try {
+        data.delete('website');
+        const response = await fetch(endpoint, { method: 'POST', body: data, headers: { Accept: 'application/json' } });
+        if (!response.ok) throw new Error(String(response.status));
+        form.reset();
+        showStatus('success', 'Request sent.', 'Thank you. Your request has been received.');
+      } catch {
+        showStatus('error', 'Your request could not be sent.', 'Please try again, or use the contact details on this page.');
+      } finally {
+        if (submit) {
+          submit.disabled = false;
+          submit.removeAttribute('aria-busy');
+        }
+      }
+    });
+  }
+</script>
+
+<style>
+  .contact-grid {
+    display: grid;
+    gap: var(--space-2xl);
+  }
+
+  @media (min-width: 60rem) {
+    .contact-grid {
+      grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+      align-items: start;
+    }
+
+    .contact-aside {
+      position: sticky;
+      top: calc(var(--header-height) + var(--space-l));
+    }
+  }
+
+  .form-title {
+    font-size: var(--step-3);
+    margin-bottom: var(--space-l);
+    scroll-margin-top: calc(var(--header-height) + var(--space-l));
+  }
+
+  .form-notice {
+    margin-bottom: var(--space-l);
+    padding: var(--space-s) var(--space-m);
+    border: 1px dashed #b98a2e;
+    border-radius: var(--radius);
+    background: #fff6dc;
+    color: #4d3a10;
+    font-size: var(--step--1);
+  }
+
+  .form-notice .label {
+    color: #7a5200;
+    margin-bottom: var(--space-3xs);
+  }
+
+  .error-summary {
+    margin-bottom: var(--space-l);
+    padding: var(--space-m);
+    border: 2px solid #a61b1b;
+    border-radius: var(--radius);
+    background: #fdf1f1;
+  }
+
+  .error-summary:focus-visible {
+    outline-offset: 4px;
+  }
+
+  .error-summary__title {
+    font-size: var(--step-1);
+    color: #7d1010;
+  }
+
+  .error-summary ul {
+    margin-top: var(--space-2xs);
+    padding-left: 1.2em;
+  }
+
+  .error-summary a {
+    color: #7d1010;
+    font-weight: 600;
+  }
+
+  .form {
+    display: grid;
+    gap: var(--space-xl);
+  }
+
+  .form__group {
+    display: grid;
+    gap: var(--space-m);
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+
+  .form__group > legend {
+    width: 100%;
+    padding-bottom: var(--space-xs);
+    margin-bottom: var(--space-m);
+    border-bottom: 1px solid var(--ink);
+  }
+
+  .form__row {
+    display: grid;
+    gap: var(--space-m);
+  }
+
+  @media (min-width: 40rem) {
+    .form__row {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .choice {
+    border: 0;
+    padding: 0;
+    min-width: 0;
+  }
+
+  .choice__legend {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    font-weight: 600;
+    margin-bottom: var(--space-2xs);
+  }
+
+  .choice__opt {
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .choice__options {
+    display: grid;
+    gap: var(--space-2xs);
+  }
+
+  .choice__option {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    min-height: 3rem;
+    padding: 0.6rem 0.85rem;
+    border: 1px solid var(--ink-muted);
+    border-radius: var(--radius);
+    background: var(--paper-raised);
+    cursor: pointer;
+  }
+
+  .choice__option:hover {
+    border-color: var(--ink);
+  }
+
+  .choice__option:has(input:checked) {
+    border-color: var(--ink);
+    box-shadow: inset 4px 0 0 var(--copper);
+  }
+
+  .choice__option input {
+    width: 1.15rem;
+    height: 1.15rem;
+    margin: 0;
+    accent-color: var(--copper);
+  }
+
+  .form__trap {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  .form__submit {
+    display: grid;
+    gap: var(--space-s);
+    justify-items: start;
+    padding-top: var(--space-m);
+    border-top: 1px solid var(--rule);
+  }
+
+  .form__privacy {
+    font-size: var(--step--1);
+    color: var(--ink-muted);
+  }
+
+  .form-status {
+    padding: var(--space-m);
+    border-radius: var(--radius);
+    border: 1px solid var(--ink);
+  }
+
+  .form-status:global(.form-status--info) {
+    background: #fff6dc;
+    border-color: #b98a2e;
+    color: #4d3a10;
+  }
+
+  .form-status:global(.form-status--success) {
+    background: #eef7f1;
+    border-color: #2f7a52;
+  }
+
+  .form-status:global(.form-status--error) {
+    background: #fdf1f1;
+    border-color: #a61b1b;
+  }
+
+  .form-status :global(.form-status__title) {
+    font-weight: 700;
+    margin-bottom: var(--space-3xs);
+  }
+
+  .aside-block {
+    padding-block: var(--space-m);
+    border-top: 1px solid var(--ink);
+  }
+
+  .aside-block + .aside-block {
+    border-top-color: var(--rule);
+  }
+
+  .direct {
+    display: grid;
+    gap: var(--space-s);
+    margin-top: var(--space-s);
+  }
+
+  .direct dt {
+    font-size: var(--step--1);
+    color: var(--ink-muted);
+  }
+
+  .direct dd {
+    font-size: var(--step-1);
+    font-weight: 500;
+    overflow-wrap: anywhere;
+  }
+
+  .checklist {
+    list-style: none;
+    padding: 0;
+    margin-top: var(--space-s);
+    display: grid;
+    gap: 0.4rem;
+    font-size: var(--step--1);
+    color: var(--ink-soft);
+  }
+
+  .checklist li::before {
+    content: '—';
+    margin-right: 0.6em;
+    color: var(--copper);
+  }
+
+  .aside-block--rates p {
+    margin-block: var(--space-xs);
+    font-size: var(--step--1);
+    color: var(--ink-soft);
+  }
+</style>

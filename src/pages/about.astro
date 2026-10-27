@@ -1,0 +1,220 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/PageHero.astro';
+import SectionHeading from '@/components/SectionHeading.astro';
+import Fact from '@/components/Fact.astro';
+import ReviewTag from '@/components/ReviewTag.astro';
+import OwnerContent from '@/components/OwnerContent.astro';
+import CtaBand from '@/components/CtaBand.astro';
+import { business } from '@/config/business';
+import { addressAsText } from '@/lib/facts';
+
+const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
+const addressFact = addressAsText(business.address);
+---
+
+<BaseLayout
+  title="About"
+  description="About Weewire: a low-voltage and network infrastructure contractor providing cabling, fiber troubleshooting, data center deployment and on-site technical support."
+>
+  <PageHero
+    eyebrow="About"
+    title="A low-voltage and network infrastructure contractor."
+    lede="Weewire works on the physical side of business networks: cabling, fiber, data center equipment and the on-site support that keeps it all running."
+  />
+
+  <section class="section" aria-labelledby="work-title">
+    <div class="container about-grid">
+      <div data-reveal>
+        <SectionHeading index="01" eyebrow="The work" title="What we work on." id="work-title" />
+      </div>
+      <div data-reveal style="--reveal-delay:80ms">
+        <ul class="work-list" role="list">
+          {
+            services.map((s) => (
+              <li>
+                <a href={`/services#${s.id}`}>{s.data.title}</a>
+                <span>{s.data.summary}</span>
+              </li>
+            ))
+          }
+        </ul>
+        <ReviewTag status="unverified" text="Service list pending confirmation" />
+      </div>
+    </div>
+  </section>
+
+  <section class="section rule-top" aria-labelledby="story-title">
+    <div class="container about-grid">
+      <div data-reveal>
+        <SectionHeading index="02" eyebrow="Company" title="Background." id="story-title" />
+      </div>
+      <div class="stack" data-reveal style="--reveal-delay:80ms">
+        <OwnerContent title="Company history and background">
+          When the business started, who leads it, and the kinds of clients and projects it takes on. To be written from details the owner
+          supplies.
+        </OwnerContent>
+        <OwnerContent title="Team and project photography">
+          Real photos of the team, vehicles or completed work, with permission to publish. These replace the technical illustrations used in
+          this prototype.
+        </OwnerContent>
+      </div>
+    </div>
+  </section>
+
+  <section class="section on-night" aria-labelledby="license-title">
+    <div class="container about-grid">
+      <div data-reveal>
+        <SectionHeading index="03" eyebrow="Credentials" title="Licensing." id="license-title">
+          Contractor licensing details as currently published.
+        </SectionHeading>
+      </div>
+      <div data-reveal style="--reveal-delay:80ms">
+        <dl class="license-list">
+          {
+            business.licenses.map((license) =>
+              license.value ? (
+                <div class="license">
+                  <dt class="license__number">
+                    {license.value.label}
+                    <ReviewTag status={license.status} source={license.source} />
+                  </dt>
+                  <dd>
+                    <span class="label">Issued by</span> {license.value.authority}
+                  </dd>
+                  <dd>
+                    <span class="label">Classification</span> {license.value.classification}
+                  </dd>
+                </div>
+              ) : null,
+            )
+          }
+        </dl>
+        <p class="license-note">
+          Arizona contractor licenses can be checked with the{' '}
+          <a href="https://roc.az.gov/" rel="noopener" target="_blank">Arizona Registrar of Contractors<span class="visually-hidden"> (opens in a new tab)</span></a>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="location-title">
+    <div class="container about-grid">
+      <div data-reveal>
+        <SectionHeading index="04" eyebrow="Location" title="Where we work." id="location-title" />
+      </div>
+      <dl class="facts" data-reveal style="--reveal-delay:80ms">
+        <div>
+          <dt class="label">Service area</dt>
+          <dd><Fact fact={business.serviceArea} label="Service area" /></dd>
+        </div>
+        <div>
+          <dt class="label">Business address</dt>
+          <dd><Fact fact={addressFact} label="New business address" /></dd>
+        </div>
+        <div>
+          <dt class="label">Hours</dt>
+          <dd><Fact fact={business.hours} label="Business hours" /></dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <CtaBand />
+</BaseLayout>
+
+<style>
+  .about-grid {
+    display: grid;
+    gap: var(--space-l) var(--space-2xl);
+  }
+
+  @media (min-width: 60rem) {
+    .about-grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
+    }
+  }
+
+  .work-list {
+    list-style: none;
+    padding: 0;
+    margin-bottom: var(--space-s);
+    border-top: 1px solid var(--ink);
+  }
+
+  .work-list li {
+    display: grid;
+    gap: 0.2rem;
+    padding-block: var(--space-s);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .work-list a {
+    font-size: var(--step-1);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .work-list a:hover {
+    color: var(--copper);
+  }
+
+  .work-list span {
+    color: var(--ink-soft);
+    font-size: var(--step--1);
+  }
+
+  .stack {
+    display: grid;
+    gap: var(--space-m);
+  }
+
+  .license-list {
+    border-top: 1px solid var(--night-rule);
+  }
+
+  .license {
+    display: grid;
+    gap: var(--space-2xs);
+    padding-block: var(--space-m);
+    border-bottom: 1px solid var(--night-rule);
+  }
+
+  .license__number {
+    font-size: var(--step-3);
+    font-weight: 650;
+    font-stretch: 88%;
+    letter-spacing: -0.02em;
+    margin-bottom: var(--space-2xs);
+  }
+
+  .license dd .label {
+    display: inline-block;
+    min-width: 9rem;
+  }
+
+  .license-note {
+    margin-top: var(--space-m);
+    color: var(--night-muted);
+    font-size: var(--step--1);
+  }
+
+  .facts {
+    border-top: 1px solid var(--ink);
+  }
+
+  .facts > div {
+    display: grid;
+    gap: var(--space-3xs) var(--space-l);
+    padding-block: var(--space-s);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  @media (min-width: 40rem) {
+    .facts > div {
+      grid-template-columns: 10rem 1fr;
+      align-items: baseline;
+    }
+  }
+</style>
