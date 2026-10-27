@@ -107,6 +107,12 @@ The prototype is blocked from indexing in four independent ways:
 - [ ] `PUBLIC_SITE_INDEXING=true` and the `X-Robots-Tag` header removed from `vercel.json`
 - [ ] DNS change planned and approved by the owner
 
-## Deployment (Vercel preview)
+## Deployment (Vercel)
 
-`vercel.json` configures the Astro framework preset, `npm run build`, the `dist` output, clean URLs without trailing slashes, and security/caching headers. Connect this repository to a Vercel project to get a preview URL per branch push. No production domain should be attached until launch is approved.
+- **Project:** `wee-wire` in the "AMIGO's projects" Vercel team (Hobby plan), linked to `Amigo-1234/wee-wire`.
+- **Branch:** `claude/weewire-website-audit-w95115` (the repository's default branch, so Vercel treats it as the project's production branch). Every push deploys automatically.
+- **Addresses:** `*.vercel.app` only. No custom domain is attached, and weewire.com DNS is untouched.
+- **Access:** Vercel Authentication (the team default) protects all `*.vercel.app` URLs, so viewers need access to the Vercel team, or a share link, to open the prototype.
+- **Indexing:** `vercel.json` sets security and caching headers and `X-Robots-Tag: noindex, nofollow` on every response.
+
+Do not attach a custom domain or remove the noindex header until launch is approved (see the checklist above).

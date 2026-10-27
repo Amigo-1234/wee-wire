@@ -5,10 +5,12 @@
  */
 interface Props {
   class?: string;
+  /** Needed only if this diagram appears more than once on a page. */
+  idSuffix?: string;
   dark?: boolean;
 }
 const { class: className, dark = false } = Astro.props;
-const titleId = `otdr-title-${Math.random().toString(36).slice(2, 8)}`;
+const titleId = Astro.props.idSuffix ? `otdr-title-${Astro.props.idSuffix}` : 'otdr-title';
 
 // A schematic loss-over-distance trace with a few reflective events.
 const trace =

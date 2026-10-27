@@ -2,9 +2,11 @@
 /** Illustrative floor plan with horizontal cable runs from a telecom room to outlets. */
 interface Props {
   class?: string;
+  /** Needed only if this diagram appears more than once on a page. */
+  idSuffix?: string;
 }
 const { class: className } = Astro.props;
-const titleId = `plan-title-${Math.random().toString(36).slice(2, 8)}`;
+const titleId = Astro.props.idSuffix ? `plan-title-${Astro.props.idSuffix}` : 'plan-title';
 
 const outlets: [number, number][] = [
   [70, 70], [170, 70], [270, 70],

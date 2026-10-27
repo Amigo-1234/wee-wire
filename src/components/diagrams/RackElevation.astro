@@ -4,9 +4,11 @@
  */
 interface Props {
   class?: string;
+  /** Needed only if this diagram appears more than once on a page. */
+  idSuffix?: string;
 }
 const { class: className } = Astro.props;
-const titleId = `rack-title-${Math.random().toString(36).slice(2, 8)}`;
+const titleId = Astro.props.idSuffix ? `rack-title-${Astro.props.idSuffix}` : 'rack-title';
 
 const U = 36; // height of one rack unit in the drawing
 const top = 56;
