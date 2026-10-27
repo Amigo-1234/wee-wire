@@ -23,6 +23,8 @@ export interface Fact<T> {
   source: string;
   /** Anything a reviewer should know (conflicts, caveats). */
   note?: string;
+  /** Possible values awaiting a decision. Never rendered. */
+  candidates?: T[];
 }
 
 export interface License {
@@ -51,25 +53,32 @@ export interface BusinessInfo {
   hours: Fact<string>;
   onCallSupport: Fact<string>;
   licenses: Fact<License>[];
+  /** City and state the business operates from. */
+  locality: Fact<string>;
   socialProfiles: { label: string; url: string }[];
-  logo: Fact<{ src: string; width: number; height: number; alt: string }>;
 }
 
+/*
+ * Not stored here on purpose: email credentials, tax ID, staff personal
+ * phone numbers, and the full street address (withheld until the owner
+ * approves publishing it; this repository is public).
+ */
+
+const OWNER_EMAIL = 'Owner email, Oct 2026';
 const CURRENT_SITE = 'Indexed text of the current weewire.com homepage (search-engine index)';
 
 export const business: BusinessInfo = {
   /** Brand name as it appears in the current site's page title. */
   displayName: {
     value: 'Weewire',
-    status: 'unverified',
-    source: 'Current weewire.com page title',
+    status: 'confirmed',
+    source: 'Owner-supplied logo and company email signature',
   },
 
   legalName: {
     value: 'Weewire LLC',
-    status: 'unverified',
-    source:
-      'Arizona Registrar of Contractors dual-license posting list (seen via search index) and current site footer',
+    status: 'confirmed',
+    source: 'Owner-supplied logo and company email signature; matches the AZ ROC posting list',
   },
 
   email: {
@@ -81,16 +90,23 @@ export const business: BusinessInfo = {
   phone: {
     value: null,
     status: 'missing',
-    source: 'Conflicting sources',
+    source: OWNER_EMAIL,
     note:
-      'Four different numbers appear across the current homepage, the current pricing page, ZoomInfo and Yellow Pages. Not shown until the owner confirms one.',
+      'The owner supplied two company numbers but has not yet said which is the public contact number. A staff email signature lists 480-702-1168 as "Main, option 1". Not shown until the owner confirms which number to publish.',
+    candidates: ['480-702-1168', '480-702-1161'],
   },
 
   address: {
     value: null,
     status: 'missing',
-    source: 'Owner',
-    note: 'The owner has a new business address that has not been supplied yet. Directory listings conflict (Maricopa AZ, Tempe AZ, Albuquerque NM).',
+    source: OWNER_EMAIL,
+    note: 'The owner supplied a street address in Maricopa, AZ. It is withheld from the site and this public repository until the owner confirms it should be published (it may not be a public business location).',
+  },
+
+  locality: {
+    value: 'Maricopa, Arizona',
+    status: 'confirmed',
+    source: `${OWNER_EMAIL} (business address)`,
   },
 
   serviceArea: {
@@ -127,13 +143,4 @@ export const business: BusinessInfo = {
 
   socialProfiles: [],
 
-  /**
-   * Official logo. While null, a plain typeset wordmark is used as a temporary
-   * treatment. When supplied, place the file in /public/brand/ and set the path.
-   */
-  logo: {
-    value: null,
-    status: 'missing',
-    source: 'Owner (logo files in owner email, not yet supplied)',
-  },
 };

@@ -18,6 +18,6 @@ export function telHref(phone: string): string {
 
 /** Formats an address fact as a single-line string fact for display. */
 export function addressAsText(fact: Fact<Address>): Fact<string> {
-  const a = fact.value;
-  return { ...fact, value: a ? [a.street, a.locality, `${a.region} ${a.postalCode}`.trim()].filter(Boolean).join(', ') : null };
+  const { candidates: _candidates, value: a, ...rest } = fact;
+  return { ...rest, value: a ? [a.street, a.locality, `${a.region} ${a.postalCode}`.trim()].filter(Boolean).join(', ') : null };
 }

@@ -1,37 +1,41 @@
-// Generates public/og-default.png (1200×630) for link previews.
-// Run with: node scripts/generate-og.mjs
-// Uses system fonts for rendering; regenerate once the official logo arrives.
+// Generates public/og-default.png (1200×630) for link previews, using the
+// logo from src/assets/brand. Run with: node scripts/generate-og.mjs
+// Re-run whenever the logo is replaced.
 import sharp from 'sharp';
 import { fileURLToPath } from 'node:url';
 
+const logoPath = fileURLToPath(new URL('../src/assets/brand/weewire-logo-primary.png', import.meta.url));
 const out = fileURLToPath(new URL('../public/og-default.png', import.meta.url));
 
-const ports = Array.from({ length: 12 }, (_, i) => `<rect x="${700 + i * 34}" y="250" width="22" height="18" fill="#ece9e3"/>`).join('');
-const leds = Array.from({ length: 12 }, (_, i) =>
-  i % 5 === 0 ? '' : `<circle cx="${711 + i * 34}" cy="306" r="3" fill="${i % 4 === 1 ? '#e2a93b' : '#46b583'}"/>`,
-).join('');
-const ports2 = Array.from({ length: 12 }, (_, i) => `<rect x="${700 + i * 34}" y="316" width="22" height="18" fill="#ece9e3"/>`).join('');
-const cords = [0, 3, 5, 8, 10]
-  .map((i) => {
-    const x = 711 + i * 34;
-    return `<path d="M ${x} 268 C ${x} 288, ${x + 10} 296, ${x + 10} 316" stroke="#e48a5c" stroke-width="3" fill="none"/>`;
-  })
-  .join('');
+const W = 1200;
+const H = 630;
+const plate = { x: 72, y: 150, w: 520, h: 300 };
 
-const svg = `
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
-  <rect width="1200" height="630" fill="#0e1318"/>
-  <g stroke="#1c252e" stroke-width="1">
-    ${Array.from({ length: 26 }, (_, i) => `<line x1="${i * 48}" y1="0" x2="${i * 48}" y2="630"/>`).join('')}
-    ${Array.from({ length: 14 }, (_, i) => `<line x1="0" y1="${i * 48}" x2="1200" y2="${i * 48}"/>`).join('')}
-  </g>
-  <rect x="676" y="220" width="452" height="146" fill="#151c23" stroke="#5b6773"/>
-  ${ports}${leds}${ports2}${cords}
-  <text x="72" y="120" font-family="DejaVu Sans Mono, monospace" font-size="22" letter-spacing="3" fill="#a3acb5">LOW-VOLTAGE &amp; NETWORK INFRASTRUCTURE</text>
-  <text x="72" y="330" font-family="Inter Display, Inter, sans-serif" font-weight="700" font-size="104" letter-spacing="-3" fill="#ece9e3">Weewire</text>
-  <text x="72" y="420" font-family="Inter, sans-serif" font-size="34" fill="#a3acb5">Cabling · Fiber · Data center · On-site support</text>
-  <rect x="72" y="520" width="56" height="6" fill="#e48a5c"/>
+const grid = [
+  ...Array.from({ length: 26 }, (_, i) => `<line x1="${i * 48}" y1="0" x2="${i * 48}" y2="${H}"/>`),
+  ...Array.from({ length: 14 }, (_, i) => `<line x1="0" y1="${i * 48}" x2="${W}" y2="${i * 48}"/>`),
+].join('');
+
+const background = `
+<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+  <rect width="${W}" height="${H}" fill="#0b0f13"/>
+  <g stroke="#18212a" stroke-width="1">${grid}</g>
+  <rect x="0" y="0" width="${W / 2}" height="8" fill="#00ffff"/>
+  <rect x="${W / 2}" y="0" width="${W / 2}" height="8" fill="#ff9955"/>
+  <rect x="${plate.x}" y="${plate.y}" width="${plate.w}" height="${plate.h}" rx="4" fill="#ffffff"/>
+  <text x="660" y="250" font-family="DejaVu Sans Mono, monospace" font-size="20" letter-spacing="3" fill="#a2abb4">LOW-VOLTAGE &amp; NETWORK</text>
+  <text x="660" y="280" font-family="DejaVu Sans Mono, monospace" font-size="20" letter-spacing="3" fill="#a2abb4">INFRASTRUCTURE</text>
+  <text x="660" y="350" font-family="Inter, sans-serif" font-weight="600" font-size="34" fill="#eceeee">Cabling · Fiber</text>
+  <text x="660" y="394" font-family="Inter, sans-serif" font-weight="600" font-size="34" fill="#eceeee">Data center · On-site support</text>
 </svg>`;
 
-await sharp(Buffer.from(svg)).png({ compressionLevel: 9 }).toFile(out);
+const logoHeight = plate.h - 60;
+const logo = await sharp(logoPath).resize({ height: logoHeight }).png().toBuffer();
+const { width: logoWidth } = await sharp(logo).metadata();
+
+await sharp(Buffer.from(background))
+  .composite([{ input: logo, left: Math.round(plate.x + (plate.w - logoWidth) / 2), top: plate.y + 30 }])
+  .png({ compressionLevel: 9 })
+  .toFile(out);
+
 console.log(`Wrote ${out}`);

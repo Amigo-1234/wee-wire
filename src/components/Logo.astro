@@ -1,0 +1,50 @@
+---
+/**
+ * The Weewire logo. `blend` sits the logo's white background into light
+ * surfaces; `plate` places it on a white panel for dark surfaces.
+ * Height is set in CSS (--logo-h) so the logo scales without distortion.
+ */
+import { Image } from 'astro:assets';
+import { brand } from '@/config/brand';
+
+interface Props {
+  /** Largest rendered height in CSS pixels; used to size the generated image. */
+  height?: number;
+  variant?: 'blend' | 'plate';
+  alt?: string;
+  /** Load immediately (for the header). Defaults to lazy loading. */
+  eager?: boolean;
+  class?: string;
+}
+
+const { height = 64, variant = 'blend', alt = brand.logo.alt, eager = false, class: className } = Astro.props;
+const { image } = brand.logo;
+const width = Math.round((height * image.width) / image.height);
+---
+
+<span class:list={['logo', `logo--${variant}`, className]}>
+  <Image src={image} alt={alt} width={width} height={height} densities={[1, 2, 3]} format="png" loading={eager ? 'eager' : 'lazy'} decoding="async" />
+</span>
+
+<style>
+  .logo {
+    display: inline-flex;
+    line-height: 0;
+  }
+
+  .logo :global(img) {
+    height: var(--logo-h, 3.5rem);
+    width: auto;
+    max-width: none;
+  }
+
+  .logo--blend :global(img) {
+    mix-blend-mode: multiply;
+  }
+
+  .logo--plate {
+    padding: 0.6rem 0.8rem;
+    background: #fff;
+    border-radius: var(--radius);
+  }
+</style>

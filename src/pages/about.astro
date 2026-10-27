@@ -110,8 +110,12 @@ const addressFact = addressAsText(business.address);
           <dd><Fact fact={business.serviceArea} label="Service area" /></dd>
         </div>
         <div>
-          <dt class="label">Business address</dt>
-          <dd><Fact fact={addressFact} label="New business address" /></dd>
+          <dt class="label">Based in</dt>
+          <dd><Fact fact={business.locality} label="Location" /></dd>
+        </div>
+        <div>
+          <dt class="label">Street address</dt>
+          <dd><Fact fact={addressFact} label="Publishing decision" /></dd>
         </div>
         <div>
           <dt class="label">Hours</dt>
@@ -157,7 +161,7 @@ const addressFact = addressAsText(business.address);
   }
 
   .work-list a:hover {
-    color: var(--copper);
+    color: var(--accent);
   }
 
   .work-list span {

@@ -7,33 +7,48 @@
 :root {
   color-scheme: light;
 
+  /* Brand colours, sampled from the Weewire logo (src/config/brand.ts).
+     Raw cyan and orange are decorative on light surfaces; text uses the
+     darker "-ink" variants. Both raw colours are text-safe on dark. */
+  --brand-cyan: #00ffff;
+  --brand-orange: #ff9955;
+
   /* Surfaces */
-  --paper: #f4f2ed;
-  --paper-raised: #fbfaf7;
-  --paper-sunk: #e9e6df;
-  --night: #0e1318;
-  --night-raised: #151c23;
+  --paper: #f6f6f3;
+  --paper-raised: #ffffff;
+  --paper-sunk: #ebece8;
+  --night: #0b0f13;
+  --night-raised: #131a20;
 
   /* Text */
-  --ink: #11161c;
-  --ink-soft: #39424c;
-  --ink-muted: #59636e;
-  --night-text: #ece9e3;
-  --night-muted: #a3acb5;
+  --ink: #0c0f12;
+  --ink-soft: #3a424b;
+  --ink-muted: #5a636d;
+  --night-text: #eceeee;
+  --night-muted: #a2abb4;
 
   /* Lines */
-  --rule: #d5d1c7;
-  --rule-strong: #aca79c;
-  --night-rule: #29333d;
+  --rule: #d8d9d4;
+  --rule-strong: #a9aca6;
+  --night-rule: #26303a;
 
-  /* Accent: copper. Used sparingly for emphasis and primary actions. */
-  --copper: #a8431b;
-  --copper-strong: #8a3412;
-  --copper-on-night: #e48a5c;
-  --signal: #46b583; /* decorative status LEDs only */
+  /* Accents */
+  --accent: #b04a0c; /* orange, text-safe on light surfaces */
+  --accent-on-night: var(--brand-orange);
+  --cyan-ink: #00707d; /* cyan, text-safe on light surfaces */
+  --cyan-on-night: var(--brand-cyan);
+  --signal: #2fbf7f; /* decorative status LEDs only */
 
-  --focus: #1d5bd8;
-  --focus-on-night: #9dbcff;
+  /* Primary action: brand orange with dark text (9.1:1) */
+  --action-bg: var(--brand-orange);
+  --action-bg-hover: #ff8a3d;
+  --action-text: var(--ink);
+
+  --focus: var(--cyan-ink);
+  --focus-on-night: var(--brand-cyan);
+
+  /* Two-tone rule echoing the logo's cyan and orange halves */
+  --split-rule: linear-gradient(90deg, var(--brand-cyan) 0 50%, var(--brand-orange) 50% 100%);
 
   /* Type */
   --font-sans: 'Archivo Variable', 'Archivo', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -62,7 +77,7 @@
   --gutter: clamp(1rem, 0.5rem + 2.5vw, 2.5rem);
   --max-width: 78rem;
   --radius: 2px;
-  --header-height: 4.25rem;
+  --header-height: 4.75rem;
 
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --duration: 600ms;
@@ -89,6 +104,12 @@ html {
 @media (prefers-reduced-motion: no-preference) {
   html {
     scroll-behavior: smooth;
+  }
+}
+
+@media (min-width: 60rem) {
+  :root {
+    --header-height: 5.25rem;
   }
 }
 
@@ -135,7 +156,7 @@ a {
 }
 
 a:hover {
-  text-decoration-color: var(--copper);
+  text-decoration-color: var(--accent);
 }
 
 :focus-visible {
@@ -149,8 +170,8 @@ a:hover {
 }
 
 ::selection {
-  background: var(--ink);
-  color: var(--paper);
+  background: var(--brand-cyan);
+  color: var(--ink);
 }
 
 /* Typography --------------------------------------------------------------- */
@@ -230,7 +251,7 @@ p {
 }
 
 .prose a {
-  color: var(--copper);
+  color: var(--cyan-ink);
 }
 
 /* Mono technical label: section indices, spec keys, metadata. */

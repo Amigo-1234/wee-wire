@@ -128,8 +128,12 @@ const endpoint = site.formEndpoint;
               <dd><Fact fact={business.onCallSupport} label="Support hours" /></dd>
             </div>
             <div>
-              <dt>Address</dt>
-              <dd><Fact fact={addressAsText(business.address)} label="New business address" /></dd>
+              <dt>Based in</dt>
+              <dd><Fact fact={business.locality} label="Location" /></dd>
+            </div>
+            <div>
+              <dt>Street address</dt>
+              <dd><Fact fact={addressAsText(business.address)} label="Publishing decision" /></dd>
             </div>
           </dl>
         </div>
@@ -428,14 +432,14 @@ const endpoint = site.formEndpoint;
 
   .choice__option:has(input:checked) {
     border-color: var(--ink);
-    box-shadow: inset 4px 0 0 var(--copper);
+    box-shadow: inset 4px 0 0 var(--accent);
   }
 
   .choice__option input {
     width: 1.15rem;
     height: 1.15rem;
     margin: 0;
-    accent-color: var(--copper);
+    accent-color: var(--accent);
   }
 
   .form__trap {
@@ -525,7 +529,7 @@ const endpoint = site.formEndpoint;
   .checklist li::before {
     content: '—';
     margin-right: 0.6em;
-    color: var(--copper);
+    color: var(--accent);
   }
 
   .aside-block--rates p {

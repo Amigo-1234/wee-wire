@@ -59,6 +59,10 @@ const deposit = terms.find((t) => t.term === 'Deposit');
             <dt class="label">Support</dt>
             <dd><Fact fact={business.onCallSupport} label="Support hours" /></dd>
           </div>
+          <div>
+            <dt class="label">Based in</dt>
+            <dd><Fact fact={business.locality} label="Location" /></dd>
+          </div>
         </dl>
       </div>
 
@@ -292,6 +296,7 @@ const deposit = terms.find((t) => t.term === 'Deposit');
   }
 
   .hero__titleblock {
+    position: relative;
     display: flex;
     justify-content: space-between;
     gap: var(--space-s);
@@ -299,6 +304,14 @@ const deposit = terms.find((t) => t.term === 'Deposit');
     border-top: 1px solid var(--ink);
     font-size: var(--step--1);
     font-weight: 500;
+  }
+
+  .hero__titleblock::before {
+    content: '';
+    position: absolute;
+    inset: -1px 0 auto;
+    height: 3px;
+    background: var(--split-rule);
   }
 
   .hero__titleblock .label {
@@ -346,7 +359,7 @@ const deposit = terms.find((t) => t.term === 'Deposit');
 
   .svc-row__num {
     padding-top: 0.45em;
-    color: var(--copper);
+    color: var(--accent);
   }
 
   .svc-row__main {
@@ -380,14 +393,14 @@ const deposit = terms.find((t) => t.term === 'Deposit');
   .svc-row__link:hover .svc-row__arrow,
   .svc-row__link:focus-visible .svc-row__arrow {
     transform: translateX(6px);
-    color: var(--copper);
+    color: var(--accent);
   }
 
   .svc-row__link:hover .svc-row__title {
     text-decoration: underline;
     text-decoration-thickness: 1px;
     text-underline-offset: 0.18em;
-    text-decoration-color: var(--copper);
+    text-decoration-color: var(--accent);
   }
 
   @media (min-width: 60rem) {
@@ -462,7 +475,7 @@ const deposit = terms.find((t) => t.term === 'Deposit');
     display: inline-block;
     width: 1.5rem;
     font-family: var(--font-mono);
-    color: var(--copper-on-night);
+    color: var(--accent-on-night);
   }
 
   .feature__figure figcaption {
@@ -502,7 +515,8 @@ const deposit = terms.find((t) => t.term === 'Deposit');
     left: 0;
     width: 10px;
     height: 10px;
-    background: var(--copper);
+    background: var(--brand-orange);
+    box-shadow: 10px 0 0 var(--brand-cyan);
   }
 
   .step h3 {

@@ -1,7 +1,7 @@
 ---
 import { primaryNav, requestServiceHref } from '@/config/site';
 import { business } from '@/config/business';
-import Wordmark from './Wordmark.astro';
+import Logo from './Logo.astro';
 import Button from './Button.astro';
 import Fact from './Fact.astro';
 import { publicPath } from '@/lib/paths';
@@ -13,7 +13,7 @@ const isCurrent = (href: string) => current === href;
 <header class="site-header" data-header>
   <div class="container site-header__inner">
     <a href="/" class="site-header__brand" aria-label={`${business.displayName.value ?? 'Weewire'} — home`}>
-      <Wordmark />
+      <Logo height={68} eager />
     </a>
 
     <nav class="site-nav" aria-label="Primary">
@@ -109,7 +109,7 @@ const isCurrent = (href: string) => current === href;
     position: sticky;
     top: 0;
     z-index: 50;
-    background: rgba(244, 242, 237, 0.94);
+    background: rgba(246, 246, 243, 0.96);
     backdrop-filter: saturate(1.4) blur(10px);
     border-bottom: 1px solid transparent;
     transition: border-color 200ms ease;
@@ -128,9 +128,16 @@ const isCurrent = (href: string) => current === href;
   }
 
   .site-header__brand {
-    text-decoration: none;
+    --logo-h: 3.25rem;
     margin-right: auto;
-    padding-block: var(--space-2xs);
+    text-decoration: none;
+    border-radius: var(--radius);
+  }
+
+  @media (min-width: 60rem) {
+    .site-header__brand {
+      --logo-h: 4.25rem;
+    }
   }
 
   .site-nav {
@@ -160,8 +167,8 @@ const isCurrent = (href: string) => current === href;
     left: 0;
     right: 0;
     bottom: 0;
-    height: 2px;
-    background: var(--copper);
+    height: 3px;
+    background: var(--split-rule);
     transform: scaleX(0);
     transform-origin: left;
     transition: transform 240ms var(--ease-out);
@@ -250,7 +257,8 @@ const isCurrent = (href: string) => current === href;
   }
 
   .mobile-nav__link[aria-current='page'] {
-    color: var(--copper);
+    box-shadow: inset 4px 0 0 var(--brand-orange);
+    padding-left: var(--space-s);
   }
 
   .mobile-nav__footer {

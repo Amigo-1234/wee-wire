@@ -58,6 +58,7 @@ const trace =
   }
 
   .otdr--dark {
+    --o-trace: var(--cyan-on-night);
     --o-ink: var(--night-text);
     --o-muted: var(--night-muted);
     --o-grid: var(--night-rule);
@@ -81,7 +82,7 @@ const trace =
   }
 
   .otdr__trace {
-    stroke: var(--o-ink);
+    stroke: var(--o-trace, var(--o-ink));
     stroke-width: 1.75;
     stroke-linejoin: round;
   }
@@ -92,29 +93,29 @@ const trace =
   }
 
   .otdr__fault line {
-    stroke: var(--copper);
+    stroke: var(--accent);
     stroke-width: 1;
     stroke-dasharray: 3 3;
   }
 
   .otdr__fault circle {
     fill: none;
-    stroke: var(--copper);
+    stroke: var(--accent);
     stroke-width: 1.75;
   }
 
   .otdr .otdr__fault text {
-    fill: var(--copper);
+    fill: var(--accent);
     font-weight: 500;
   }
 
   .otdr--dark .otdr__fault line,
   .otdr--dark .otdr__fault circle {
-    stroke: var(--copper-on-night);
+    stroke: var(--accent-on-night);
   }
 
   .otdr--dark .otdr__fault text {
-    fill: var(--copper-on-night);
+    fill: var(--accent-on-night);
   }
 
   @media (prefers-reduced-motion: no-preference) {

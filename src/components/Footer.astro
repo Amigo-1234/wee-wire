@@ -1,7 +1,8 @@
 ---
 import { business } from '@/config/business';
 import { footerNav, site } from '@/config/site';
-import Wordmark from './Wordmark.astro';
+import Logo from './Logo.astro';
+import { brand } from '@/config/brand';
 import Fact from './Fact.astro';
 import ReviewTag from './ReviewTag.astro';
 
@@ -13,9 +14,10 @@ const legalName = business.legalName.value ?? business.displayName.value ?? 'Wee
   <div class="container">
     <div class="site-footer__top">
       <div class="site-footer__brand">
-        <Wordmark />
+        <Logo variant="plate" height={104} class="site-footer__logo" />
         <p class="site-footer__descriptor">
           Network cabling, fiber troubleshooting, data center deployment and on-site technical support.
+          <span class="site-footer__locality"><Fact fact={business.locality} label="Location" /></span>
         </p>
       </div>
 
@@ -54,7 +56,7 @@ const legalName = business.legalName.value ?? business.displayName.value ?? 'Wee
     </div>
 
     <div class="site-footer__bottom">
-      <p>© {year} {legalName}</p>
+      <p>© {year} {legalName} · {brand.tagline}</p>
       {site.showReviewMarkers && <p>Prototype build · not the production website</p>}
     </div>
   </div>
@@ -62,8 +64,17 @@ const legalName = business.legalName.value ?? business.displayName.value ?? 'Wee
 
 <style>
   .site-footer {
+    position: relative;
     padding-block: var(--space-2xl) var(--space-l);
     font-size: var(--step--1);
+  }
+
+  .site-footer::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: 4px;
+    background: var(--split-rule);
   }
 
   .site-footer__top {
@@ -78,8 +89,14 @@ const legalName = business.legalName.value ?? business.displayName.value ?? 'Wee
     max-width: 26rem;
   }
 
-  .site-footer__brand :global(.wordmark) {
-    font-size: 1.75rem;
+  .site-footer__brand :global(.site-footer__logo) {
+    --logo-h: 5.5rem;
+  }
+
+  .site-footer__locality {
+    display: block;
+    margin-top: var(--space-2xs);
+    color: var(--night-text);
   }
 
   .site-footer__descriptor {
@@ -100,7 +117,7 @@ const legalName = business.legalName.value ?? business.displayName.value ?? 'Wee
   }
 
   .site-footer__col a:hover {
-    text-decoration-color: var(--copper-on-night);
+    text-decoration-color: var(--accent-on-night);
   }
 
   .site-footer__sub {
