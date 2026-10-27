@@ -6,7 +6,7 @@ Prototype redesign of the Weewire website, built with [Astro](https://astro.buil
 
 ## Getting started
 
-Requires Node.js 22.23.4 or later (Node 24 recommended).
+Requires Node.js 22.23.4 or later (Node 24 recommended; Astro 7).
 
 ```sh
 npm install
@@ -49,17 +49,22 @@ Every business detail lives in `src/config/business.ts` and carries a status:
 
 To update a detail: set `value`, change `status` to `'confirmed'`, and update `source`.
 
-**Do not add details that have not been supplied or confirmed by the owner.** Phone numbers, the new address, service area, hours, testimonials, client names and the official logo are intentionally absent.
+**Do not add details that have not been supplied or confirmed by the owner.**
+
+- **Phone:** the owner supplied two numbers without saying which is the public one. Both are recorded as `candidates` on `business.phone` (never rendered). Once the owner chooses, set `value` and `status: 'confirmed'`.
+- **Address:** the owner supplied a street address; only the locality (Maricopa, Arizona) is used. The street address is deliberately kept out of this public repository and the site until the owner approves publishing it.
+- **Never commit:** email credentials or mail-server settings, tax IDs, or staff personal phone numbers. This repository is public.
+- Testimonials, client names, service area and hours are intentionally absent.
 
 Pricing (`src/data/pricing.ts`) and services (`src/content/services/*.md`) follow the same rule: values come from the current site's indexed text and are marked `unverified` until confirmed.
 
-### Adding the official logo
+### Logo and brand colours
 
-1. Put the SVG (preferred) or PNG in `public/brand/`.
-2. Set `business.logo.value` to `{ src: '/brand/logo.svg', width, height, alt: 'Weewire' }` and its status to `'confirmed'`.
-3. Regenerate the share image with the real logo (`scripts/generate-og.mjs`).
+The owner-supplied primary logo lives at `src/assets/brand/weewire-logo-primary.png` (only its empty white margin was trimmed) and is wired up in `src/config/brand.ts`. `src/components/Logo.astro` renders it at 1×/2×/3× density without distortion: blended into light surfaces in the header, and on a white plate over the dark footer.
 
-Until then the header and footer use a plain typeset name as a temporary treatment.
+To use a higher-resolution or vector version: add the file to `src/assets/brand/`, change the import in `src/config/brand.ts`, then run `node scripts/generate-og.mjs` to refresh the share image. Never stretch, recolour or redraw the logo.
+
+The palette is derived from the logo (cyan `#00ffff`, orange `#ff9955`, black, white) and defined as tokens in `src/styles/global.css`. Raw cyan and orange are used decoratively and on dark backgrounds; text on light backgrounds uses the darker `--cyan-ink` and `--accent` variants so it meets WCAG AA. Primary buttons use brand orange with dark text (9.1:1).
 
 ### Adding photography
 
